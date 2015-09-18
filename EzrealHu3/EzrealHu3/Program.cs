@@ -20,7 +20,8 @@ namespace EzrealHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Menu EzrealMenu, ComboMenu, HarassMenu;
+        public static Menu EzrealMenu, ComboMenu, HarassMenu, LastHitMenu;
+        private static Slider _Mana;
 
 
         static void Main(string[] args)
@@ -54,6 +55,12 @@ namespace EzrealHu3
             HarassMenu.AddSeparator();
             HarassMenu.Add("harassQ", new CheckBox("Use Q"));
             HarassMenu.Add("harassW", new CheckBox("Use E"));
+
+            LastHitMenu = EzrealMenu.AddSubMenu("LastHit", "LastHit");
+            LastHitMenu.AddGroupLabel("LastHit");
+            LastHitMenu.AddSeparator();
+            LastHitMenu.Add("lasthitQ", new CheckBox("Use Q"));
+            LastHitMenu.Add("lasthitMana", new Slider("ManaQ", 30, 0, 100));
             Game.OnTick += Game_OnTick;
 
         }
@@ -66,6 +73,10 @@ namespace EzrealHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
+            }
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
+            {
+                LastHit();
             }
         }
 
@@ -122,5 +133,18 @@ namespace EzrealHu3
             }
 
         }
-    }
+        private static void LastHit()
+        {
+            var useQ = LastHitMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
+            var mana = LastHitMenu["lasthitMana"].Cast<Slider>().CurrentValue;
+
+            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+            {
+                    if (Q.GetPrediction(EntityManager.GetLaneMinions(radius: 1190)[0]).HitChance >= HitChance.High)
+                    {
+                        Q.Cast(EntityManager.GetLaneMinions(radius: 1190)[0]);
+                    }                
+            }
+        }
+     }
 }

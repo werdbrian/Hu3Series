@@ -95,12 +95,18 @@ namespace EzrealHu3
             }
 
         }
+        //Damages
+        public static float QDamage(Obj_AI_Base target)
+        {
+            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
+                (float)(new[] { 35, 55, 75, 95, 110 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
+        }
 
         private static void KillSteal()
         {
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
             {
-                if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                if (Q.GetPrediction(target).HitChance >= HitChance.High && target.Health > QDamage())
                 {
                     Q.Cast(target);
                 }
@@ -113,7 +119,7 @@ namespace EzrealHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie && !target.HasUndyingBuff()))
             {
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
@@ -152,15 +158,15 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-
+            
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
-                    if (Q.GetPrediction(EntityManager.GetLaneMinions(radius: 1190)[0]).HitChance >= HitChance.High)
-                    {
-                        Q.Cast(EntityManager.GetLaneMinions(radius: 1190)[0]);
-                    }                
+                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
+                if (minion == null) return;
+                Q.Cast(minion);
             }
         }
+
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)

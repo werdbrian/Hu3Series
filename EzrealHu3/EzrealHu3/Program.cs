@@ -22,7 +22,6 @@ namespace EzrealHu3
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
         public static Menu EzrealMenu, SettingsMenu;
-        private static Slider _Mana;
 
 
         static void Main(string[] args)
@@ -44,7 +43,7 @@ namespace EzrealHu3
             Bootstrap.Init(null);
 
             Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)60f);
-            W = new Spell.Skillshot(SpellSlot.W, 800, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
+            W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
@@ -101,12 +100,11 @@ namespace EzrealHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 35, 55, 75, 95, 110 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
         }
-
         private static void KillSteal()
         {
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health > QDamage(hero)))
             {
-                if (Q.GetPrediction(target).HitChance >= HitChance.High && target.Health > QDamage())
+                if (Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
@@ -147,13 +145,14 @@ namespace EzrealHu3
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() & useW && W.IsReady())
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
                 }
             }
 
         }
+
         private static void LastHit()
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;

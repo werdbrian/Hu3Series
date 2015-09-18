@@ -1,1 +1,11 @@
 C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\EzrealHu3.exe.config
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\EzrealHu3.exe
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\EzrealHu3.pdb
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\EloBuddy.dll
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\SharpDX.dll
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\obj\Debug\EzrealHu3.csprojResolveAssemblyReference.cache
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\obj\Debug\EzrealHu3.exe
+C:\Users\Mario Gabriell\Documents\GitHub\Hu3Series\EzrealHu3\EzrealHu3\obj\Debug\EzrealHu3.pdb

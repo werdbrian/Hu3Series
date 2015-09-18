@@ -113,34 +113,19 @@ namespace EzrealHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
-            if (useQ && Q.IsReady())
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        Q.Cast(target);
-                    }
+                    Q.Cast(target);
                 }
-            }
-            if (useW && W.IsReady())
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
+                if (useW && W.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
-                    if (W.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        W.Cast(target);
-                    }
+                    W.Cast(target);
                 }
-            }
-            if (useR && R.IsReady())
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead && !o.IsZombie))
+                if (useW && W.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
-                    if (R.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        R.Cast(target);
-                    }
+                    R.Cast(target);
                 }
             }
         }
@@ -150,21 +135,13 @@ namespace EzrealHu3
 
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-
-            if (useQ && Q.IsReady())
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        Q.Cast(target);
-                    }
+                    Q.Cast(target);
                 }
-            }
-            if (useW && E.IsReady())
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie
-                    && o.HasBuffOfType(BuffType.Poison)))
+                if (useW && W.IsReady() & useW && W.IsReady())
                 {
                     W.Cast(target);
                 }

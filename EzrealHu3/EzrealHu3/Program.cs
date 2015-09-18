@@ -9,7 +9,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
-using Microsoft.Win32;
+using EloBuddy.SDK.Rendering;
+using Color = System.Drawing.Color;
 
 
 namespace EzrealHu3
@@ -29,8 +30,16 @@ namespace EzrealHu3
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
         }
 
+        public static AIHeroClient _Player
+        {
+            get { return ObjectManager.Player; }
+        }
+
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
+            if (Player.Instance.ChampionName != "Ezreal")
+                return;
+
             TargetSelector.Init();
             Bootstrap.Init(null);
 
@@ -46,24 +55,24 @@ namespace EzrealHu3
 
             SettingsMenu = EzrealMenu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
-            SettingsMenu.AddSeparator();
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
-            SettingsMenu.AddSeparator();
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
-            SettingsMenu.AddSeparator();
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
-            SettingsMenu.AddSeparator();
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal Not Working"));
+            SettingsMenu.AddLabel("Draw");
+            SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
+            SettingsMenu.Add("drawW", new CheckBox("Draw W"));
 
             Game.OnTick += Game_OnTick;
+            Drawing.OnDraw += Drawing_OnDraw;
 
         }
         private static void Game_OnTick(EventArgs args)
@@ -102,12 +111,13 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {
                 foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
                     {
                         Q.Cast(target);
                     }
@@ -117,9 +127,19 @@ namespace EzrealHu3
             {
                 foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    if (W.GetPrediction(target).HitChance >= HitChance.High)
+                    if (W.GetPrediction(target).HitChance >= HitChance.Medium)
                     {
                         W.Cast(target);
+                    }
+                }
+            }
+            if (useR && R.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (R.GetPrediction(target).HitChance >= HitChance.High)
+                    {
+                        R.Cast(target);
                     }
                 }
             }
@@ -135,7 +155,7 @@ namespace EzrealHu3
             {
                 foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
                     {
                         Q.Cast(target);
                     }
@@ -166,6 +186,14 @@ namespace EzrealHu3
         }
         private static void Drawing_OnDraw(EventArgs args)
         {
+            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.Red, Radius = Q.Range }.Draw(_Player.Position);
+            }
+            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.Blue, Radius = W.Range }.Draw(_Player.Position);
+            }
 
         }
     }

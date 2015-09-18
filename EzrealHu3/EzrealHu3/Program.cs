@@ -71,8 +71,8 @@ namespace EzrealHu3
 
         private static void Combo()
         {
-            var useQ = ComboMenu["combo.q"].Cast<CheckBox>().CurrentValue;
-            var useW = ComboMenu["combo.w"].Cast<CheckBox>().CurrentValue;
+            var useQ = ComboMenu["comboQ"].Cast<CheckBox>().CurrentValue;
+            var useW = ComboMenu["comboW"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {

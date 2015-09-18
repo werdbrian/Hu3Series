@@ -65,6 +65,7 @@ namespace EzrealHu3
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
+            SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
@@ -92,7 +93,7 @@ namespace EzrealHu3
             {
                 LastHit();
             }
-            if (SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue)
+            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
             }
@@ -116,6 +117,10 @@ namespace EzrealHu3
         }
         private static void KillSteal()
         {
+            var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
+
             foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
             {
                 if (Q.GetPrediction(target).HitChance >= HitChance.High)

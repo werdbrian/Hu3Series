@@ -45,7 +45,7 @@ namespace EzrealHu3
             Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)60f);
             W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
+            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
             EzrealMenu.AddGroupLabel("Ezreal Hu3");
@@ -65,10 +65,14 @@ namespace EzrealHu3
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal Not Working"));
+            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
+            SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
+            SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
+
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -100,13 +104,37 @@ namespace EzrealHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 35, 55, 75, 95, 110 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
         }
+        public static float WDamage(Obj_AI_Base target)
+        {
+            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
+                (float)(new[] { 70, 115, 160, 205, 250 }[Program.Q.Level] + 0.8 * _Player.FlatMagicDamageMod));
+        }
+        public static float RDamage(Obj_AI_Base target)
+        {
+            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
+                (float)(new[] { 350, 500, 650 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
+        }
         private static void KillSteal()
         {
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health > QDamage(hero)))
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
             {
                 if (Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
+                }
+            }
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
+            {
+                if (W.GetPrediction(target).HitChance >= HitChance.High)
+                {
+                    W.Cast(target);
+                }
+            }
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(2000) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
+            {
+                if (R.GetPrediction(target).HitChance >= HitChance.High)
+                {
+                    R.Cast(target);
                 }
             }
         }
@@ -119,15 +147,15 @@ namespace EzrealHu3
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     W.Cast(target);
                 }
-                if (useW && W.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
+                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target))
                 {
                     R.Cast(target);
                 }
@@ -175,6 +203,10 @@ namespace EzrealHu3
             if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
             {
                 new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
+            }
+            if (SettingsMenu["drawR"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
     }

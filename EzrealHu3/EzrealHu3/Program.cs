@@ -20,7 +20,7 @@ namespace EzrealHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Menu EzrealMenu, ComboMenu, HarassMenu, LaneMenu;
+        public static Menu EzrealMenu, ComboMenu, HarassMenu;
 
 
         static void Main(string[] args)
@@ -33,10 +33,10 @@ namespace EzrealHu3
             TargetSelector.Init();
             Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, (int)0.75f, Int32.MaxValue, (int)40f);
-            W = new Spell.Skillshot(SpellSlot.W, 850, SkillShotType.Circular, (int)0.5f, Int32.MaxValue, (int)90f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Circular, (int)0.25f, Int32.MaxValue, (int)60f);
+            W = new Spell.Skillshot(SpellSlot.W, 800, SkillShotType.Circular, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 825, SkillShotType.Cone, (int)0.6f, Int32.MaxValue, (int)(80 * Math.PI / 180));
+            R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Cone, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("EzrealHu3", "ezrealhu3");
             EzrealMenu.AddGroupLabel("EzrealHu3");

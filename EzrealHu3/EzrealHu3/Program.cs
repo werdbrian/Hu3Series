@@ -47,16 +47,20 @@ namespace EzrealHu3
             SettingsMenu = EzrealMenu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddSeparator();
+            SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddSeparator();
+            SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
             SettingsMenu.AddSeparator();
+            SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddSeparator();
+            SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
 
             Game.OnTick += Game_OnTick;

@@ -40,7 +40,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("EzrealHu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3");
+            EzrealMenu.AddGroupLabel("EzrealHu3");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 

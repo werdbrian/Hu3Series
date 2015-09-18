@@ -20,7 +20,7 @@ namespace EzrealHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Menu EzrealMenu, ComboMenu, HarassMenu, LastHitMenu;
+        public static Menu EzrealMenu, SettingsMenu;
         private static Slider _Mana;
 
 
@@ -44,23 +44,19 @@ namespace EzrealHu3
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
-            ComboMenu = EzrealMenu.AddSubMenu("Combo", "Combo");
-            ComboMenu.AddGroupLabel("Combo");
-            ComboMenu.AddSeparator();
-            ComboMenu.Add("comboQ", new CheckBox("Use Q"));
-            ComboMenu.Add("comboW", new CheckBox("Use W"));
+            SettingsMenu = EzrealMenu.AddSubMenu("Settings", "Settings");
+            SettingsMenu.AddGroupLabel("Settings");
+            SettingsMenu.AddSeparator();
+            SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
+            SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
+            SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
+            SettingsMenu.AddSeparator();
+            SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
+            SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
+            SettingsMenu.AddSeparator();
+            SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
+            SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
 
-            HarassMenu = EzrealMenu.AddSubMenu("Harass", "Harass");
-            HarassMenu.AddGroupLabel("Harass");
-            HarassMenu.AddSeparator();
-            HarassMenu.Add("harassQ", new CheckBox("Use Q"));
-            HarassMenu.Add("harassW", new CheckBox("Use E"));
-
-            LastHitMenu = EzrealMenu.AddSubMenu("LastHit", "LastHit");
-            LastHitMenu.AddGroupLabel("LastHit");
-            LastHitMenu.AddSeparator();
-            LastHitMenu.Add("lasthitQ", new CheckBox("Use Q"));
-            LastHitMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
             Game.OnTick += Game_OnTick;
 
         }
@@ -82,8 +78,8 @@ namespace EzrealHu3
 
         private static void Combo()
         {
-            var useQ = ComboMenu["comboQ"].Cast<CheckBox>().CurrentValue;
-            var useW = ComboMenu["comboW"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {
@@ -110,8 +106,8 @@ namespace EzrealHu3
         private static void Harass()
         {
 
-            var useQ = HarassMenu["harassQ"].Cast<CheckBox>().CurrentValue;
-            var useW = HarassMenu["harassW"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {
@@ -135,8 +131,8 @@ namespace EzrealHu3
         }
         private static void LastHit()
         {
-            var useQ = LastHitMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
-            var mana = LastHitMenu["lasthitMana"].Cast<Slider>().CurrentValue;
+            var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
+            var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
 
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
@@ -146,5 +142,9 @@ namespace EzrealHu3
                     }                
             }
         }
-     }
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+
+        }
+    }
 }

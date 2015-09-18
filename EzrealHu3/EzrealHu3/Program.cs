@@ -165,11 +165,11 @@ namespace EzrealHu3
         {
             if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
             {
-                new Circle() { Color = Color.Red, Radius = Q.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Red, BorderWidth= 1, Radius = Q.Range }.Draw(_Player.Position);
             }
             if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
             {
-                new Circle() { Color = Color.Blue, Radius = W.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
 
         }

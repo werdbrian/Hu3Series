@@ -56,6 +56,8 @@ namespace EzrealHu3
             SettingsMenu.AddSeparator();
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
+            SettingsMenu.AddSeparator();
+            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
 
             Game.OnTick += Game_OnTick;
 
@@ -73,6 +75,22 @@ namespace EzrealHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
             {
                 LastHit();
+            }
+            if (SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue)
+            {
+                KillSteal();
+            }
+
+        }
+
+        private static void KillSteal()
+        {
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            {
+                if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                {
+                    Q.Cast(target);
+                }
             }
         }
 

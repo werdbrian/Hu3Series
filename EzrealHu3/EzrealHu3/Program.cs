@@ -40,7 +40,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("EzrealHu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("EzrealHu3");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -60,7 +60,7 @@ namespace EzrealHu3
             LastHitMenu.AddGroupLabel("LastHit");
             LastHitMenu.AddSeparator();
             LastHitMenu.Add("lasthitQ", new CheckBox("Use Q"));
-            LastHitMenu.Add("lasthitMana", new Slider("ManaQ", 30, 0, 100));
+            LastHitMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
             Game.OnTick += Game_OnTick;
 
         }

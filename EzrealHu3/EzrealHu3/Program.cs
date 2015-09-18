@@ -119,7 +119,7 @@ namespace EzrealHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie && !target.HasUndyingBuff()))
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {

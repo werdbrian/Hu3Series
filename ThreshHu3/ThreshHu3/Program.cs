@@ -110,8 +110,6 @@ namespace ThreshHu3
                 }
                 if (useE && E.IsReady() && E.GetPrediction(target).HitChance >= HitChance.Medium && !target.HasBuff("ThreshQ") && target.IsValidTarget(E.Range))
                 {
-                    var isFleeing = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
-
                     var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
                     var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
 

@@ -11,15 +11,16 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
-
+using SharpDX;
 
 namespace ThreshHu3
 {
     class Program
     {
         public static Spell.Skillshot Q;
+        public static Spell.Active Q2;
         public static Spell.Skillshot W;
-        public static Spell.Targeted E;
+        public static Spell.Skillshot E;
         public static Spell.Skillshot R;
         public static Menu ThreshMenu, SettingsMenu;
 
@@ -36,16 +37,16 @@ namespace ThreshHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Ezreal")
+            if (Player.Instance.ChampionName != "Thresh")
                 return;
 
             TargetSelector.Init();
             Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1100, SkillShotType.Linear, (int)0.500f, Int32.MaxValue, (int)70f);
-            Q2 = new Spell.Active(SpellSlot.Q, 1400);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1080, SkillShotType.Linear, (int)0.500f, Int32.MaxValue, (int)70f);
+            Q2 = new Spell.Active(SpellSlot.Q, 1300);
             W = new Spell.Skillshot(SpellSlot.W, 950, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
-            E = new Spell.Targeted(SpellSlot.E, 400);
+            E = new Spell.Skillshot(SpellSlot.E, 500, SkillShotType.Linear, 1, 2000, 110);
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             ThreshMenu = MainMenu.AddMenu("Thresh Hu3", "threshhu3");
@@ -89,25 +90,41 @@ namespace ThreshHu3
         
         private static void Combo()
         {
+            
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useQ2 = SettingsMenu["comboQ2"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            var minR = SettingsMenu["comboRmin"].Cast<Slider>().CurrentValue;
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ2 && Q2.IsReady() && target.HasBuff("ThreshQ"))
                 {
-                    W.Cast(target);
+                    Q2.Cast();
                 }
-                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target))
+                if (useE && E.IsReady() && E.GetPrediction(target).HitChance >= HitChance.Medium && !target.HasBuff("ThreshQ") && target.IsValidTarget(E.Range))
                 {
-                    R.Cast(target);
+                    var isFleeing = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+
+                    var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
+                    var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
+
+                    var vector = new Vector3(
+                        Player.Instance.ServerPosition.X + x,
+                        Player.Instance.ServerPosition.Y + y,
+                        Player.Instance.ServerPosition.Z);
+
+                    E.Cast(vector);
+                }
+                if (useR && R.IsReady() && Player.Instance.CountEnemiesInRange(R.Range) >= minR)
+                {
+                    R.Cast();
                 }
             }
         }

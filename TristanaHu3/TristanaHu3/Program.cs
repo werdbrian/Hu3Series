@@ -20,7 +20,7 @@ namespace TristanaHu3
         public static Spell.Active Q;
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
-        public static Spell.Skillshot R;
+        public static Spell.Targeted R;
         public static Menu TristanaMenu, SettingsMenu;
 
 
@@ -45,7 +45,7 @@ namespace TristanaHu3
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
+            R = new Spell.Targeted(SpellSlot.R, 900);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
             TristanaMenu.AddGroupLabel("Tristana Hu3 1.0");
@@ -56,8 +56,7 @@ namespace TristanaHu3
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
-            SettingsMenu.Add("comboE", new CheckBox("Use Q on Combo"));
-            SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
+            SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
@@ -107,19 +106,10 @@ namespace TristanaHu3
 
         private static void KillSteal()
         {
-            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
-
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
-            {
-                if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High)
-                {
-                    W.Cast(target);
-                }
-            }
             foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(2000) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
             {
-                if (R.IsReady() && useR && R.GetPrediction(target).HitChance >= HitChance.High)
+                if (R.IsReady() && useR && R.Cast(target))
                 {
                     R.Cast(target);
                 }
@@ -128,21 +118,17 @@ namespace TristanaHu3
 
         private static void Combo()
         {
+            var hasBuffTristE = Player.Instance.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && hasBuffTristE)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium)
-                {
-                    W.Cast(target);
-                }
-                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target))
+                if (useR && R.IsReady() && R. && target.Health <= RDamage(target))
                 {
                     R.Cast(target);
                 }

@@ -21,7 +21,7 @@ namespace ThreshHu3
         public static Spell.Active Q2;
         public static Spell.Skillshot W;
         public static Spell.Skillshot E;
-        public static Spell.Skillshot R;
+        public static Spell.Active R;
         public static Menu ThreshMenu, SettingsMenu;
 
 
@@ -43,11 +43,11 @@ namespace ThreshHu3
             TargetSelector.Init();
             Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1080, SkillShotType.Linear, (int)0.500f, Int32.MaxValue, (int)70f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1080, SkillShotType.Linear, (int)0.35f, 1200, 60);
             Q2 = new Spell.Active(SpellSlot.Q, 1300);
-            W = new Spell.Skillshot(SpellSlot.W, 950, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
+            W = new Spell.Skillshot(SpellSlot.W, 950, SkillShotType.Circular, (int)0.25f, 1750, 300);
             E = new Spell.Skillshot(SpellSlot.E, 500, SkillShotType.Linear, 1, 2000, 110);
-            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
+            R = new Spell.Active(SpellSlot.R, 350);
 
             ThreshMenu = MainMenu.AddMenu("Thresh Hu3", "threshhu3");
             ThreshMenu.AddGroupLabel("Thresh Hu3 1.0");
@@ -69,11 +69,23 @@ namespace ThreshHu3
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawE", new CheckBox("Draw E"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
+            SettingsMenu.AddLabel("Misc");
+            SettingsMenu.Add("gapE", new CheckBox("Anti GapCloser E"));
 
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
+            Gapcloser.OnGapCloser += Gapcloser_OnGapCloser;
 
+        }
+        private static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapCloserEventArgs e)
+        {
+            if (!e.Sender.IsValidTarget() || !SettingsMenu["gapE"].Cast<CheckBox>().CurrentValue)
+            {
+                return;
+            }
+
+            E.Cast(e.Sender);
         }
         private static void Game_OnTick(EventArgs args)
         {
@@ -108,17 +120,18 @@ namespace ThreshHu3
                 {
                     Q2.Cast();
                 }
-                if (useE && E.IsReady() && E.GetPrediction(target).HitChance >= HitChance.Medium && !target.HasBuff("ThreshQ") && target.IsValidTarget(E.Range))
+                if (useE && E.IsReady() && target.IsValidTarget(E.Range) && E.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
+                    var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+                    var predictionE = E.GetPrediction(target);
                     var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
                     var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
-
-                    var vector = new Vector3(
+                    var v3 = new Vector3(
                         Player.Instance.ServerPosition.X + x,
                         Player.Instance.ServerPosition.Y + y,
                         Player.Instance.ServerPosition.Z);
 
-                    E.Cast(vector);
+                    E.Cast(getOutRange ? predictionE.CastPosition : v3);
                 }
                 if (useR && R.IsReady() && Player.Instance.CountEnemiesInRange(R.Range) >= minR)
                 {
@@ -134,13 +147,22 @@ namespace ThreshHu3
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
-                if (useE && E.IsReady() && E.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(E.Range))
+                if (useE && E.IsReady() && target.IsValidTarget(E.Range) && E.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
-                    E.Cast(target);
+                    var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+                    var predictionE = E.GetPrediction(target);
+                    var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
+                    var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
+                    var v3 = new Vector3(
+                        Player.Instance.ServerPosition.X + x,
+                        Player.Instance.ServerPosition.Y + y,
+                        Player.Instance.ServerPosition.Z);
+
+                    E.Cast(getOutRange ? predictionE.CastPosition : v3);
                 }
             }
         }

@@ -66,14 +66,16 @@ namespace TristanaHu3
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
             ActivatorMenu = TristanaMenu.AddSubMenu("Activator", "Activator");
-            ActivatorMenu.AddGroupLabel("Potion Items");
             ActivatorMenu.AddGroupLabel("Potions Health");
             ActivatorMenu.Add("healthPotionManager", new CheckBox("Health Potion", true));
             ActivatorMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 20));
             ActivatorMenu.AddGroupLabel("Potions Mana");
             ActivatorMenu.Add("manaPotionManager", new CheckBox("Mana Potion", true));
-            ActivatorMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 20));
-            ActivatorMenu.AddSeparator();
+            ActivatorMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 20));            
+            ActivatorMenu.AddGroupLabel("Items");
+            ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
+            ActivatorMenu.Add("muramana", new CheckBox("Muramana"));
+            ActivatorMenu.Add("youmu", new CheckBox("Muramana"));
 
 
             Game.OnTick += Game_OnTick;

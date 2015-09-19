@@ -116,7 +116,7 @@ namespace ThreshHu3
                 {
                     Q.Cast(target);
                 }
-                if (useQ2 && Q2.IsReady() && target.HasBuff("ThreshQ"))
+                if (useQ2 && Q2.IsReady() && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range))
                 {
                     Q2.Cast();
                 }

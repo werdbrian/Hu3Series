@@ -146,16 +146,7 @@ namespace TristanaHu3
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
-            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
-            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
-            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
-            var useCleanser = ActivatorMenu["cleanser"].Cast<CheckBox>().CurrentValue;
-            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
-            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
-            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
-
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
                 if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                 {
@@ -164,15 +155,6 @@ namespace TristanaHu3
                 if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast();
-                }
-                if (target.HealthPercent <= bladeS && (blade1.IsOwned() || blade2.IsOwned()) && (blade1.IsReady() || blade2.IsReady()))
-                {
-                    blade1.Cast(target);
-                    blade2.Cast(target);
-                }
-                if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
-                {
-                    youmu.Cast();
                 }
             }
         }
@@ -232,11 +214,32 @@ namespace TristanaHu3
             var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
             var changeT = ActivatorMenu["changeT"].Cast<Slider>().CurrentValue;
             var changeS = ActivatorMenu["changeS"].Cast<Slider>().CurrentValue;
+            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
+            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
+            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
+            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
+            var useCleanser = ActivatorMenu["cleanser"].Cast<CheckBox>().CurrentValue;
+            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
+            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
+            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
             var healthP = new Item((int)ItemId.Health_Potion);
             var manaP = new Item((int)ItemId.Health_Potion);
             var trinketG = new Item((int)ItemId.Warding_Totem_Trinket);
             var trinketB = new Item((int)ItemId.Scrying_Orb_Trinket);
 
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            {
+                if (target.HealthPercent <= bladeS && (blade1.IsOwned() || blade2.IsOwned()) && (blade1.IsReady() || blade2.IsReady()))
+                {
+                    blade1.Cast(target);
+                    blade2.Cast(target);
+                }
+                if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
+                {
+                    youmu.Cast();
+                }
+            }
+                
             if (useHealthP && Player.Instance.HealthPercent < healthS)
             {
                 healthP.Cast();

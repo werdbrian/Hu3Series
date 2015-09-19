@@ -8,6 +8,7 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
+using SharpDX;
 
 
 namespace TristanaHu3
@@ -18,7 +19,7 @@ namespace TristanaHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Targeted R;
-        public static Menu TristanaMenu, SettingsMenu;
+        public static Menu TristanaMenu, SettingsMenu, ActivatorMenu;
 
 
         static void Main(string[] args)
@@ -64,12 +65,22 @@ namespace TristanaHu3
             SettingsMenu.Add("drawE", new CheckBox("Draw E"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
+            ActivatorMenu = TristanaMenu.AddSubMenu("Activator", "Activator");
+            ActivatorMenu.AddGroupLabel("Potion Items");
+            ActivatorMenu.AddGroupLabel("Potions Health");
+            ActivatorMenu.Add("healthPotionManager", new CheckBox("Health Potion", true));
+            ActivatorMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 20));
+            ActivatorMenu.AddGroupLabel("Potions Mana");
+            ActivatorMenu.Add("manaPotionManager", new CheckBox("Mana Potion", true));
+            ActivatorMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 20));
+            ActivatorMenu.AddSeparator();
 
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
 
         }
+
         private static void Game_OnTick(EventArgs args)
         {
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)

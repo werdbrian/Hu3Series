@@ -13,12 +13,12 @@ using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
 
 
-namespace EzrealHu3
+namespace KatarinaHu3
 {
     class Program
     {
-        public static Spell.Skillshot Q;
-        public static Spell.Skillshot W;
+        public static Spell.Targeted Q;
+        public static Spell.Targeted W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
         public static Menu EzrealMenu, SettingsMenu;
@@ -95,10 +95,6 @@ namespace EzrealHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
             {
                 LastHit();
-            }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
-            {
-                LaneClear();
             }
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
@@ -197,7 +193,7 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            
+
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
                 var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));

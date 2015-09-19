@@ -75,9 +75,9 @@ namespace TristanaHu3
             ActivatorMenu.Add("manaS", new Slider("Min Mana %", 20));            
             ActivatorMenu.AddGroupLabel("Items");
             ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
-            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
             ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
-            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
             ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
 
 

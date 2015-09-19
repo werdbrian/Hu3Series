@@ -56,7 +56,7 @@ namespace TristanaHu3
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
+            SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
@@ -66,16 +66,19 @@ namespace TristanaHu3
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
             ActivatorMenu = TristanaMenu.AddSubMenu("Activator", "Activator");
+            ActivatorMenu.Add("useitems", new CheckBox("Use Activator"));
             ActivatorMenu.AddGroupLabel("Potions Health");
-            ActivatorMenu.Add("healthPotionManager", new CheckBox("Health Potion", true));
-            ActivatorMenu.Add("healthPotionManagerMinMeHP", new Slider("Min HP %", 20));
+            ActivatorMenu.Add("healthP", new CheckBox("Health Potion", true));
+            ActivatorMenu.Add("healthS", new Slider("Min HP %", 20));
             ActivatorMenu.AddGroupLabel("Potions Mana");
-            ActivatorMenu.Add("manaPotionManager", new CheckBox("Mana Potion", true));
-            ActivatorMenu.Add("manaPotionManagerMinMeMana", new Slider("Min Mana %", 20));            
+            ActivatorMenu.Add("manaP", new CheckBox("Mana Potion", true));
+            ActivatorMenu.Add("manaS", new Slider("Min Mana %", 20));            
             ActivatorMenu.AddGroupLabel("Items");
             ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
-            ActivatorMenu.Add("muramana", new CheckBox("Muramana"));
-            ActivatorMenu.Add("youmu", new CheckBox("Muramana"));
+            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
+            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
 
 
             Game.OnTick += Game_OnTick;
@@ -93,11 +96,18 @@ namespace TristanaHu3
             {
                 Harass();
             }
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            {
+                LaneClear();
+            }
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
             }
-
+            if (ActivatorMenu["useitems"].Cast<CheckBox>().CurrentValue)
+            {
+                Items();
+            }
         }
         //Damages      
         public static float WDamage(Obj_AI_Base target)
@@ -134,6 +144,14 @@ namespace TristanaHu3
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
+            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
+            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
+            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
+            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
+            var useCleanser = ActivatorMenu["Cleanse"].Cast<CheckBox>().CurrentValue;
+            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
+            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
+            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
@@ -144,6 +162,15 @@ namespace TristanaHu3
                 if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast();
+                }
+                if (target.HealthPercent <= bladeS && (blade1.IsOwned() || blade2.IsOwned()) && (blade1.IsReady() || blade2.IsReady()))
+                {
+                    blade1.Cast(target);
+                    blade2.Cast(target);
+                }
+                if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
+                {
+                    youmu.Cast();
                 }
             }
         }
@@ -169,7 +196,6 @@ namespace TristanaHu3
         private static void LaneClear()
         {
             var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
-            var hasBuffTristE = minion.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
 
@@ -178,10 +204,40 @@ namespace TristanaHu3
                 if (minion == null) return;
                 E.Cast(minion);
             }
-            if (useQ && Q.IsReady() && hasBuffTristE)
+            if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
             {
                 if (minion == null) return;
                 Q.Cast();
+            }
+            foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
+            {
+                if (!tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
+                {
+                    E.Cast(tower);
+                }
+                if (tower.HasBuff("tristanaecharge"))
+                {
+                    Q.Cast();
+                }
+            }
+        }
+        private static void Items()
+        {
+            
+            var useHealthP = ActivatorMenu["healthP"].Cast<CheckBox>().CurrentValue;
+            var healthS = ActivatorMenu["healthS"].Cast<Slider>().CurrentValue;
+            var useManaP = ActivatorMenu["manaP"].Cast<CheckBox>().CurrentValue;
+            var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
+            var healthP = new Item((int)ItemId.Health_Potion);
+            var manaP = new Item((int)ItemId.Health_Potion);
+
+            if (useHealthP && Player.Instance.HealthPercent < healthS)
+            {
+                healthP.Cast();
+            }
+            if (useManaP && Player.Instance.ManaPercent < manaS)
+            {
+                manaP.Cast();
             }
         }
 

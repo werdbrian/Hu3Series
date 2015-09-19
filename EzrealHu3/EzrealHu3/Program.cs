@@ -8,8 +8,6 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
-using EzrealHu3.Activator;
-using Item = EzrealHu3.Activator.Item;
 
 
 namespace EzrealHu3
@@ -40,7 +38,6 @@ namespace EzrealHu3
 
             TargetSelector.Init();
             Bootstrap.Init(null);
-            ItemManager.Init();
 
             Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
             W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, (int)0.25f, 1600, (int)80f);
@@ -232,5 +229,9 @@ namespace EzrealHu3
                 new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
+
+        //
+
+
     }
 }

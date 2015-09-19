@@ -57,6 +57,7 @@ namespace MundoHu3
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
+            SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
@@ -64,19 +65,11 @@ namespace MundoHu3
             SettingsMenu.Add("harassE", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
-            SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
-            SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q", 30, 0, 100));
-            SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
-            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
-            SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
-            SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
-            SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
 
 
             Game.OnTick += Game_OnTick;
@@ -101,55 +94,6 @@ namespace MundoHu3
             {
                 LaneClear();
             }
-            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
-            {
-                KillSteal();
-            }
-
-        }
-        //Damages
-        public static float QDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 35, 55, 75, 95, 115 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
-        }
-        public static float WDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 70, 115, 160, 205, 250 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
-        }
-        public static float RDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 350, 500, 650 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
-        }
-        private static void KillSteal()
-        {
-            var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
-
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
-            {
-                if (Q.IsReady() && useQ && Q.GetPrediction(target).HitChance >= HitChance.High)
-                {
-                    Q.Cast(target);
-                }
-            }
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
-            {
-                if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High)
-                {
-                    W.Cast(target);
-                }
-            }
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(2000) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
-            {
-                if (R.IsReady() && useR && R.GetPrediction(target).HitChance >= HitChance.High)
-                {
-                    R.Cast(target);
-                }
-            }
         }
 
         private static void Combo()
@@ -164,13 +108,13 @@ namespace MundoHu3
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useW && W.IsReady() && target.IsValidTarget(W.Range))
                 {
-                    W.Cast(target);
+                    W.Cast();
                 }
-                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target))
+                if (useR && R.IsReady())
                 {
-                    R.Cast(target);
+                    R.Cast();
                 }
             }
         }

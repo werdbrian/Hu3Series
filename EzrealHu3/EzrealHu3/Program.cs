@@ -159,15 +159,15 @@ namespace EzrealHu3
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
                 }
-                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target))
+                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target) && target.IsValidTarget(R.Range))
                 {
                     R.Cast(target);
                 }

@@ -148,7 +148,7 @@ namespace TristanaHu3
             var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
             var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
             var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
-            var useCleanser = ActivatorMenu["Cleanse"].Cast<CheckBox>().CurrentValue;
+            var useCleanser = ActivatorMenu["cleanser"].Cast<CheckBox>().CurrentValue;
             var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
             var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
             var youmu = new Item((int)ItemId.Youmuus_Ghostblade);

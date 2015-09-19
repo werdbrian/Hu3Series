@@ -100,7 +100,6 @@ namespace ThreshHu3
             }
 
         }
-        
         private static void Combo()
         {
             
@@ -179,11 +178,11 @@ namespace ThreshHu3
             {
                 new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
             {
                 new Circle() { Color = Color.White, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)
             {
                 new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
             }

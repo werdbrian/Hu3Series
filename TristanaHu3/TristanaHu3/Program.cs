@@ -155,7 +155,7 @@ namespace TristanaHu3
             var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
             var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
 
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
             {
                 if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                 {

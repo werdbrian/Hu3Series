@@ -48,7 +48,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.1");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.2");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -123,21 +123,21 @@ namespace EzrealHu3
 
             foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
             {
-                if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                if (Q.IsReady() && useQ && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
             }
             foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
             {
-                if (W.GetPrediction(target).HitChance >= HitChance.High)
+                if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     W.Cast(target);
                 }
             }
             foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(2000) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
             {
-                if (R.GetPrediction(target).HitChance >= HitChance.High)
+                if (R.IsReady() && useR && R.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     R.Cast(target);
                 }

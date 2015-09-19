@@ -63,6 +63,7 @@ namespace ThreshHu3
             SettingsMenu.Add("comboRmin", new Slider("Min Enemies to use R", 2, 1, 5));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
+            SettingsMenu.Add("harassQ2", new CheckBox("Use Q Follow on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
@@ -144,12 +145,17 @@ namespace ThreshHu3
         {
 
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
+            var useQ2 = SettingsMenu["harassQ2"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
+                }
+                if (useQ2 && Q2.IsReady() && target.HasBuff("ThreshQ"))
+                {
+                    Q2.Cast();
                 }
                 if (useE && E.IsReady() && target.IsValidTarget(E.Range) && E.GetPrediction(target).HitChance >= HitChance.Medium)
                 {

@@ -102,7 +102,7 @@ namespace ThreshHu3
         }
         private static void Combo()
         {
-            
+
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useQ2 = SettingsMenu["comboQ2"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;

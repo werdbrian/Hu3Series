@@ -89,7 +89,7 @@ namespace MundoHu3
             }
             var autoR = SettingsMenu["autoR"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = SettingsMenu["healthAutoR"].Cast<Slider>().CurrentValue;
-            if(autoR && Player.Instance.Health < healthAutoR)
+            if(autoR && Player.Instance.HealthPercent < healthAutoR)
                 {
                 R.Cast();
                 }
@@ -129,7 +129,7 @@ namespace MundoHu3
                 {
                     E.Cast();
                 }
-                if (useR && R.IsReady() && Player.Instance.Health > rHealth)
+                if (useR && R.IsReady() && Player.Instance.HealthPercent > rHealth)
                 {
                     R.Cast();
                 }

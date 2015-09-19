@@ -42,10 +42,10 @@ namespace TristanaHu3
             TargetSelector.Init();
             Bootstrap.Init(null);
             uint level = (uint) Player.Instance.Level;
-            Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
+            Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Skillshot(SpellSlot.W, 880, SkillShotType.Circular, (int)0.50f, Int32.MaxValue, (int)250f);
-            E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Targeted(SpellSlot.R, 900);
+            E = new Spell.Targeted(SpellSlot.E, 543 + level * 7);
+            R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
             TristanaMenu.AddGroupLabel("Tristana Hu3 1.5");
@@ -60,7 +60,6 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
-            SettingsMenu.Add("towerE", new CheckBox("Use E on Towers"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
@@ -167,7 +166,6 @@ namespace TristanaHu3
             var hasBuffTristE = minion.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
-            var towerE = SettingsMenu["towerE"].Cast<CheckBox>().CurrentValue;
 
             if (useE && E.IsReady())
             {            
@@ -178,18 +176,6 @@ namespace TristanaHu3
             {
                 if (minion == null) return;
                 Q.Cast();
-            }
-            foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
-            {
-                if (towerE && !tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
-                {
-                    E.Cast(tower);
-                }
-                var buffTristE = tower.HasBuff("tristanaecharge");
-                if (buffTristE && !tower.IsDead && tower.IsEnemy && tower.IsValidTarget(Q.Range))
-                    {
-                    Q.Cast();
-                    }
             }
         }
 

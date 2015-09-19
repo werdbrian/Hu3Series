@@ -172,6 +172,12 @@ namespace TristanaHu3
                 Q.Cast();
             }
         }
+        public static bool InFountain(this AIHeroClient hero)
+        {
+            var fountainRange = 1050;
+            return hero.IsVisible
+                   && ObjectManager.Get<Obj_SpawnPoint>().Any(sp => hero.Distance(sp.Position) < fountainRange);
+        }
 
         private static void Drawing_OnDraw(EventArgs args)
         {

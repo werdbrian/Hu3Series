@@ -48,7 +48,7 @@ namespace TristanaHu3
             R = new Spell.Targeted(SpellSlot.R, 900);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 1.4");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.5");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
 
@@ -69,7 +69,7 @@ namespace TristanaHu3
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
-            SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
+            SettingsMenu.Add("drawE", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
 

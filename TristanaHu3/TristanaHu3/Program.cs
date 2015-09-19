@@ -41,8 +41,8 @@ namespace TristanaHu3
 
             TargetSelector.Init();
             Bootstrap.Init(null);
-
-            Q = new Spell.Active(SpellSlot.Q);
+            uint level = (uint) Player.Instance.Level;
+            Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
             W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Targeted(SpellSlot.R, 900);
@@ -63,7 +63,6 @@ namespace TristanaHu3
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
-            SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
@@ -118,17 +117,21 @@ namespace TristanaHu3
 
         private static void Combo()
         {
-            var hasBuffTristE = Player.Instance.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && hasBuffTristE)
+                if (useE && E.IsReady() && target.IsValidTarget(E.Range))
                 {
-                    Q.Cast(target);
+                    E.Cast(target);
                 }
-                if (useR && R.IsReady() && R. && target.Health <= RDamage(target))
+                if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                {
+                    Q.Cast();
+                }
+                if (useR && R.IsReady() && R.Cast(target) && target.Health <= RDamage(target))
                 {
                     R.Cast(target);
                 }
@@ -137,18 +140,18 @@ namespace TristanaHu3
 
         private static void Harass()
         {
-
+            var hasBuffTristE = Player.Instance.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
-                {
-                    Q.Cast(target);
-                }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
+                if (useE && E.IsReady() && E.Cast(target) && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
+                }
+                if (useQ && Q.IsReady() && hasBuffTristE)
+                {
+                    Q.Cast();
                 }
             }
 

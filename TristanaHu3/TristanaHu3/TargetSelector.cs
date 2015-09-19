@@ -27,7 +27,8 @@ namespace TristanaHu3
         {
             if (_target == null || _target.IsDead || _target.Health <= 0 || !_target.IsValidTarget())
                 _target = null;
-            if (secondaryPos.IsValid() && _target.Distance(secondaryPos) < range || _target.IsValidTarget(range))
+            var hasBuffTristE = Player.Instance.HasBuff("tristanaecharge");
+            if (secondaryPos.IsValid() && _target.Distance(secondaryPos) < range || _target.IsValidTarget(range) || hasBuffTristE)
             {
                 return _target;
             }
@@ -42,6 +43,7 @@ namespace TristanaHu3
             if (args.Msg != 0x202) return;
             if (_lastClick + 500 <= Environment.TickCount)
             {
+                
                 _target =
                     ObjectManager.Get<AIHeroClient>()
                         .OrderBy(a => a.Distance(ObjectManager.Player))

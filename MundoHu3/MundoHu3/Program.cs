@@ -59,14 +59,14 @@ namespace MundoHu3
             SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
+            SettingsMenu.Add("helthR", new Slider("Min Health To Ult", 30, 0, 100));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
-            SettingsMenu.Add("harassE", new CheckBox("Use W on Harass"));
-            SettingsMenu.AddLabel("LastHit");
-            SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
-            SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
+            SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
+            SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
+            SettingsMenu.AddLabel("Auto Ult");
+            SettingsMenu.Add("autoR", new CheckBox("Use R"));
+            SettingsMenu.Add("healthAutoR", new Slider("Min Health To Ult", 10, 0, 100));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
@@ -78,6 +78,7 @@ namespace MundoHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
+            
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -86,13 +87,23 @@ namespace MundoHu3
             {
                 Harass();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
+            var autoR = SettingsMenu["autoR"].Cast<CheckBox>().CurrentValue;
+            var healthAutoR = SettingsMenu["healthAutoR"].Cast<Slider>().CurrentValue;
+            if(autoR && Player.Instance.Health < healthAutoR)
+                {
+                R.Cast();
+                }
+            var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
+            var usingW = Player.HasBuff("BurningAgony");
+            if (useW && usingW)
             {
-                LastHit();
-            }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
-            {
-                LaneClear();
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (!target.IsValidTarget(W.Range))
+                    {
+                        W.Cast();
+                    }
+                }
             }
         }
 
@@ -100,11 +111,13 @@ namespace MundoHu3
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            var rHealth = SettingsMenu["healthR"].Cast<Slider>().CurrentValue;
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
@@ -112,7 +125,11 @@ namespace MundoHu3
                 {
                     W.Cast();
                 }
-                if (useR && R.IsReady())
+                if (useE && E.IsReady() && target.IsValidTarget(W.Range))
+                {
+                    E.Cast();
+                }
+                if (useR && R.IsReady() && Player.Instance.Health > rHealth)
                 {
                     R.Cast();
                 }
@@ -124,44 +141,23 @@ namespace MundoHu3
 
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
+                if (useW && W.IsReady() && target.IsValidTarget(W.Range))
                 {
-                    W.Cast(target);
+                    W.Cast();
+                }
+                if (useE && E.IsReady() && target.IsValidTarget(W.Range))
+                {
+                    E.Cast();
                 }
             }
         }
-
-        private static void LastHit()
-        {
-            var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
-            var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
-            {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
-                if (minion == null) return;
-                Q.Cast(minion);
-            }
-        }
-        private static void LaneClear()
-        {
-            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
-            var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
-            {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
-                if (minion == null) return;
-                Q.Cast(minion);
-            }
-        }
-
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
@@ -171,10 +167,6 @@ namespace MundoHu3
             if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
             {
                 new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
-            }
-            if (SettingsMenu["drawR"].Cast<CheckBox>().CurrentValue)
-            {
-                new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
     }

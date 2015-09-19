@@ -36,7 +36,7 @@ namespace TristanaHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Ezreal")
+            if (Player.Instance.ChampionName != "Tristana")
                 return;
 
             TargetSelector.Init();
@@ -47,8 +47,8 @@ namespace TristanaHu3
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
-            TristanaMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            TristanaMenu.AddGroupLabel("Ezreal Hu3 1.3");
+            TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.0");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
 
@@ -56,26 +56,20 @@ namespace TristanaHu3
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
+            SettingsMenu.Add("comboE", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
-            SettingsMenu.AddLabel("LastHit");
-            SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
-            SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
-            SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
-            SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
-            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
-            SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
+            SettingsMenu.Add("drawR", new CheckBox("Draw R"));
 
 
             Game.OnTick += Game_OnTick;
@@ -91,10 +85,6 @@ namespace TristanaHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
-            }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
-            {
-                LastHit();
             }
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
@@ -113,18 +103,13 @@ namespace TristanaHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1 * _Player.FlatMagicDamageMod));
         }
+        // Get buff
+
         private static void KillSteal()
         {
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
 
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
-            {
-                if (Q.IsReady() && useQ && Q.GetPrediction(target).HitChance >= HitChance.High)
-                {
-                    Q.Cast(target);
-                }
-            }
             foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
             {
                 if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High)
@@ -183,36 +168,11 @@ namespace TristanaHu3
 
         }
 
-        private static void LastHit()
-        {
-            var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
-            var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
-            {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
-                if (minion == null) return;
-                Q.Cast(minion);
-            }
-        }
-        private static void LaneClear()
-        {
-            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
-            var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
-            {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
-                if (minion == null) return;
-                Q.Cast(minion);
-            }
-        }
-
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)
             {
-                new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Red, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
             }
             if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
             {

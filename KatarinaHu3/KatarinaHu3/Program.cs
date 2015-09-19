@@ -18,10 +18,10 @@ namespace KatarinaHu3
     class Program
     {
         public static Spell.Targeted Q;
-        public static Spell.Targeted W;
+        public static Spell.Ranged W;
         public static Spell.Targeted E;
-        public static Spell.Skillshot R;
-        public static Menu EzrealMenu, SettingsMenu;
+        public static Spell.Ranged R;
+        public static Menu KatarinaMenu, SettingsMenu;
 
 
         static void Main(string[] args)
@@ -36,23 +36,23 @@ namespace KatarinaHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Ezreal")
+            if (Player.Instance.ChampionName != "Katarina")
                 return;
 
             TargetSelector.Init();
             Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)60f);
+            Q = new Spell.Targeted(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)60f);
             W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
-            EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.3");
-            EzrealMenu.AddSeparator();
-            EzrealMenu.AddLabel("Made By MarioGK");
+            KatarinaMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
+            KatarinaMenu.AddGroupLabel("Ezreal Hu3 1.3");
+            KatarinaMenu.AddSeparator();
+            KatarinaMenu.AddLabel("Made By MarioGK");
 
-            SettingsMenu = EzrealMenu.AddSubMenu("Settings", "Settings");
+            SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));

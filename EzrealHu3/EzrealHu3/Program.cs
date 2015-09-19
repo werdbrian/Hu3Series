@@ -48,7 +48,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.3");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.4");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -212,7 +212,7 @@ namespace EzrealHu3
 
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
+                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
                 if (minion == null) return;
                 Q.Cast(minion);
             }

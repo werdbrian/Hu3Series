@@ -180,11 +180,11 @@ namespace TristanaHu3
             var hasBuffTristE = Player.Instance.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useE && E.IsReady() && E.Cast(target) && target.IsValidTarget(W.Range))
+                if (useE && E.IsReady() && E.Cast(target))
                 {
-                    W.Cast(target);
+                    E.Cast(target);
                 }
                 if (useQ && Q.IsReady() && hasBuffTristE)
                 {

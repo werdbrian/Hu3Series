@@ -48,7 +48,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.2");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.3");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -64,6 +64,9 @@ namespace EzrealHu3
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
+            SettingsMenu.AddLabel("LaneClear");
+            SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
+            SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
@@ -103,12 +106,12 @@ namespace EzrealHu3
         public static float QDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 35, 55, 75, 95, 110 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 35, 55, 75, 95, 115 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
         }
         public static float WDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 70, 115, 160, 205, 250 }[Program.Q.Level] + 0.8 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 70, 115, 160, 205, 250 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
         }
         public static float RDamage(Obj_AI_Base target)
         {
@@ -152,11 +155,11 @@ namespace EzrealHu3
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High)
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
                     W.Cast(target);
                 }
@@ -191,6 +194,18 @@ namespace EzrealHu3
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
             
+            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+            {
+                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
+                if (minion == null) return;
+                Q.Cast(minion);
+            }
+        }
+        private static void LaneClear()
+        {
+            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
+            var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
+
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
                 var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));

@@ -83,9 +83,11 @@ namespace EzrealHu3
             ActivatorMenu.Add("manaS", new Slider("Min Mana %", 20));
             ActivatorMenu.AddGroupLabel("Items");
             ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
-            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
             ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
-            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
+            ActivatorMenu.Add("changeT", new CheckBox("Change Trinket To Blue"));
+            ActivatorMenu.Add("changeS", new Slider("▲ Level To Change Trinket ▲", 6, 1, 18));
             ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
 
 
@@ -115,7 +117,10 @@ namespace EzrealHu3
             {
                 KillSteal();
             }
-
+            if (ActivatorMenu["useitems"].Cast<CheckBox>().CurrentValue)
+            {
+                Items();
+            }
         }
         //Damages
         public static float QDamage(Obj_AI_Base target)
@@ -242,8 +247,33 @@ namespace EzrealHu3
             var healthS = ActivatorMenu["healthS"].Cast<Slider>().CurrentValue;
             var useManaP = ActivatorMenu["manaP"].Cast<CheckBox>().CurrentValue;
             var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
+            var changeT = ActivatorMenu["changeT"].Cast<Slider>().CurrentValue;
+            var changeS = ActivatorMenu["changeS"].Cast<Slider>().CurrentValue;
+            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
+            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
+            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
+            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
+            var useCleanser = ActivatorMenu["cleanser"].Cast<CheckBox>().CurrentValue;
+            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
+            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
+            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
             var healthP = new Item((int)ItemId.Health_Potion);
             var manaP = new Item((int)ItemId.Health_Potion);
+            var trinketG = new Item((int)ItemId.Warding_Totem_Trinket);
+            var trinketB = new Item((int)ItemId.Scrying_Orb_Trinket);
+
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            {
+                if (target.HealthPercent <= bladeS && (blade1.IsOwned() || blade2.IsOwned()) && (blade1.IsReady() || blade2.IsReady()))
+                {
+                    blade1.Cast(target);
+                    blade2.Cast(target);
+                }
+                if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
+                {
+                    youmu.Cast();
+                }
+            }
 
             if (useHealthP && Player.Instance.HealthPercent < healthS)
             {
@@ -252,6 +282,11 @@ namespace EzrealHu3
             if (useManaP && Player.Instance.ManaPercent < manaS)
             {
                 manaP.Cast();
+            }
+            if (trinketG.IsOwned() && !trinketB.IsOwned() && Player.Instance.Level == changeS)
+            {
+                Shop.SellItem(ItemId.Warding_Totem_Trinket);
+                Shop.BuyItem(ItemId.Scrying_Orb_Trinket);
             }
         }
 
@@ -270,9 +305,5 @@ namespace EzrealHu3
                 new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
-
-        //
-
-
     }
 }

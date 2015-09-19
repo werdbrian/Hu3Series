@@ -57,9 +57,6 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
-            SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
-            SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
@@ -68,7 +65,7 @@ namespace TristanaHu3
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
-            SettingsMenu.Add("drawE", new CheckBox("Draw Q"));
+            SettingsMenu.Add("drawE", new CheckBox("Draw E"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
 

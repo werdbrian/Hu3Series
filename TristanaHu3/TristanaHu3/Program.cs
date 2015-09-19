@@ -13,15 +13,15 @@ using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
 
 
-namespace EzrealHu3
+namespace TristanaHu3
 {
     class Program
     {
-        public static Spell.Skillshot Q;
+        public static Spell.Active Q;
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Menu EzrealMenu, SettingsMenu;
+        public static Menu TristanaMenu, SettingsMenu;
 
 
         static void Main(string[] args)
@@ -42,17 +42,17 @@ namespace EzrealHu3
             TargetSelector.Init();
             Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)60f);
+            Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, Int32.MaxValue, (int)(160f));
 
-            EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.5");
-            EzrealMenu.AddSeparator();
-            EzrealMenu.AddLabel("Made By MarioGK");
+            TristanaMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
+            TristanaMenu.AddGroupLabel("Ezreal Hu3 1.3");
+            TristanaMenu.AddSeparator();
+            TristanaMenu.AddLabel("Made By MarioGK");
 
-            SettingsMenu = EzrealMenu.AddSubMenu("Settings", "Settings");
+            SettingsMenu = TristanaMenu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
@@ -103,24 +103,18 @@ namespace EzrealHu3
 
         }
         //Damages
-        public static float QDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 35, 55, 75, 95, 115 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
-        }
         public static float WDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 70, 115, 160, 205, 250 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 80, 105, 130, 155, 180 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
         }
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 350, 500, 650 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1 * _Player.FlatMagicDamageMod));
         }
         private static void KillSteal()
         {
-            var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
 
@@ -186,13 +180,26 @@ namespace EzrealHu3
                     W.Cast(target);
                 }
             }
+
         }
 
         private static void LastHit()
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            
+
+            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+            {
+                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
+                if (minion == null) return;
+                Q.Cast(minion);
+            }
+        }
+        private static void LaneClear()
+        {
+            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
+            var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
+
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
                 var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));

@@ -78,6 +78,8 @@ namespace TristanaHu3
             ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
             ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
             ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
+            ActivatorMenu.Add("changeT", new CheckBox("Change Trinket To Blue"));
+            ActivatorMenu.Add("changeS", new Slider("▲ Level To Change Trinket ▲", 6, 1, 18));
             ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
 
 
@@ -228,8 +230,12 @@ namespace TristanaHu3
             var healthS = ActivatorMenu["healthS"].Cast<Slider>().CurrentValue;
             var useManaP = ActivatorMenu["manaP"].Cast<CheckBox>().CurrentValue;
             var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
+            var changeT = ActivatorMenu["changeT"].Cast<Slider>().CurrentValue;
+            var changeS = ActivatorMenu["changeS"].Cast<Slider>().CurrentValue;
             var healthP = new Item((int)ItemId.Health_Potion);
             var manaP = new Item((int)ItemId.Health_Potion);
+            var trinketG = new Item((int)ItemId.Warding_Totem_Trinket);
+            var trinketB = new Item((int)ItemId.Scrying_Orb_Trinket);
 
             if (useHealthP && Player.Instance.HealthPercent < healthS)
             {
@@ -238,6 +244,11 @@ namespace TristanaHu3
             if (useManaP && Player.Instance.ManaPercent < manaS)
             {
                 manaP.Cast();
+            }
+            if (trinketG.IsOwned() && !trinketB.IsOwned() && Player.Instance.Level == changeS)
+            {
+                Shop.SellItem(ItemId.Warding_Totem_Trinket);
+                Shop.BuyItem(ItemId.Scrying_Orb_Trinket);
             }
         }
 

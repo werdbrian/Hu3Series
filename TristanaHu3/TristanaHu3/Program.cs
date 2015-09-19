@@ -43,12 +43,12 @@ namespace TristanaHu3
             Bootstrap.Init(null);
             uint level = (uint) Player.Instance.Level;
             Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
-            W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Circular, (int)0.25f, Int32.MaxValue, (int)80f);
+            W = new Spell.Skillshot(SpellSlot.W, 880, SkillShotType.Circular, (int)0.50f, Int32.MaxValue, (int)250f);
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Targeted(SpellSlot.R, 900);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 1.3");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.4");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
 
@@ -57,14 +57,16 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
-            SettingsMenu.AddLabel("JungleClear");
+            SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
+            SettingsMenu.Add("towerE", new CheckBox("Use E on Towers"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
+            SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
@@ -93,6 +95,11 @@ namespace TristanaHu3
 
         }
         //Damages      
+        public static float WDamage(Obj_AI_Base target)
+        {
+            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
+                (float)(new[] { 80, 105, 130, 155, 180 }[Program.W.Level] + 0.5 * _Player.FlatMagicDamageMod));
+        }
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
@@ -100,12 +107,20 @@ namespace TristanaHu3
         }
         private static void KillSteal()
         {
+            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(2000) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(R.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
             {
                 if (R.IsReady() && useR && R.Cast(target))
                 {
                     R.Cast(target);
+                }
+            }
+            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
+            {
+                if (W.IsReady() && useR && W.Cast(target))
+                {
+                    W.Cast(target);
                 }
             }
         }
@@ -152,6 +167,7 @@ namespace TristanaHu3
             var hasBuffTristE = minion.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
+            var towerE = SettingsMenu["towerE"].Cast<CheckBox>().CurrentValue;
 
             if (useE && E.IsReady())
             {            
@@ -162,6 +178,18 @@ namespace TristanaHu3
             {
                 if (minion == null) return;
                 Q.Cast();
+            }
+            foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
+            {
+                if (towerE && !tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
+                {
+                    E.Cast(tower);
+                }
+                var buffTristE = tower.HasBuff("tristanaecharge");
+                if (buffTristE && !tower.IsDead && tower.IsEnemy && tower.IsValidTarget(Q.Range))
+                    {
+                    Q.Cast();
+                    }
             }
         }
 

@@ -13,14 +13,14 @@ using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
 
 
-namespace EzrealHu3
+namespace MundoHu3
 {
     class Program
     {
         public static Spell.Skillshot Q;
-        public static Spell.Skillshot W;
-        public static Spell.Targeted E;
-        public static Spell.Skillshot R;
+        public static Spell.Active W;
+        public static Spell.Active E;
+        public static Spell.Active R;
         public static Menu EzrealMenu, SettingsMenu;
 
 
@@ -42,13 +42,13 @@ namespace EzrealHu3
             TargetSelector.Init();
             Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
-            W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, 1600, (int)80f);
-            E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
+            Q = new Spell.Skillshot(SpellSlot.Q, 970, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
+            W = new Spell.Active(SpellSlot.W, 160);
+            E = new Spell.Active(SpellSlot.E);
+            R = new Spell.Active(SpellSlot.R);
 
-            EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.7");
+            EzrealMenu = MainMenu.AddMenu("Mundo Hu3", "mundohu3");
+            EzrealMenu.AddGroupLabel("Mundo Hu3 1.0");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -60,7 +60,8 @@ namespace EzrealHu3
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
+            SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
+            SettingsMenu.Add("harassE", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
             SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
@@ -196,7 +197,7 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            
+
             if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
                 var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));

@@ -18,7 +18,7 @@ namespace EzrealHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Menu EzrealMenu, SettingsMenu;
+        public static Menu EzrealMenu, SettingsMenu, ActivatorMenu;
 
 
         static void Main(string[] args)
@@ -73,6 +73,20 @@ namespace EzrealHu3
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
+            ActivatorMenu = EzrealMenu.AddSubMenu("Activator", "Activator");
+            ActivatorMenu.Add("useitems", new CheckBox("Use Activator"));
+            ActivatorMenu.AddGroupLabel("Potions Health");
+            ActivatorMenu.Add("healthP", new CheckBox("Health Potion", true));
+            ActivatorMenu.Add("healthS", new Slider("Min HP %", 20));
+            ActivatorMenu.AddGroupLabel("Potions Mana");
+            ActivatorMenu.Add("manaP", new CheckBox("Mana Potion", true));
+            ActivatorMenu.Add("manaS", new Slider("Min Mana %", 20));
+            ActivatorMenu.AddGroupLabel("Items");
+            ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
+            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
+            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲"));
+            ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
 
 
             Game.OnTick += Game_OnTick;
@@ -153,6 +167,14 @@ namespace EzrealHu3
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
+            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
+            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
+            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
+            var useCleanser = ActivatorMenu["Cleanse"].Cast<CheckBox>().CurrentValue;
+            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
+            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
+            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
@@ -211,6 +233,25 @@ namespace EzrealHu3
                 var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
                 if (minion == null) return;
                 Q.Cast(minion);
+            }
+        }
+        private static void Items()
+        {
+
+            var useHealthP = ActivatorMenu["healthP"].Cast<CheckBox>().CurrentValue;
+            var healthS = ActivatorMenu["healthS"].Cast<Slider>().CurrentValue;
+            var useManaP = ActivatorMenu["manaP"].Cast<CheckBox>().CurrentValue;
+            var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
+            var healthP = new Item((int)ItemId.Health_Potion);
+            var manaP = new Item((int)ItemId.Health_Potion);
+
+            if (useHealthP && Player.Instance.HealthPercent < healthS)
+            {
+                healthP.Cast();
+            }
+            if (useManaP && Player.Instance.ManaPercent < manaS)
+            {
+                manaP.Cast();
             }
         }
 

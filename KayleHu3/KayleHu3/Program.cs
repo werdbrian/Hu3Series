@@ -13,7 +13,7 @@ using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
 
 
-namespace MundoHu3
+namespace KayleHu3
 {
     class Program
     {
@@ -36,7 +36,7 @@ namespace MundoHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Mundo")
+            if (Player.Instance.ChampionName != "Kayle")
                 return;
 
             TargetSelector.Init();
@@ -78,7 +78,7 @@ namespace MundoHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
-            
+
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -89,10 +89,10 @@ namespace MundoHu3
             }
             var autoR = SettingsMenu["autoR"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = SettingsMenu["healthAutoR"].Cast<Slider>().CurrentValue;
-            if(autoR && Player.Instance.Health < healthAutoR)
-                {
+            if (autoR && Player.Instance.Health < healthAutoR)
+            {
                 R.Cast();
-                }
+            }
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var usingW = Player.HasBuff("BurningAgony");
             if (useW && usingW)

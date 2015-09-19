@@ -48,7 +48,7 @@ namespace TristanaHu3
             R = new Spell.Targeted(SpellSlot.R, 900);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 1.2");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.3");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
 
@@ -148,18 +148,18 @@ namespace TristanaHu3
         }
         private static void LaneClear()
         {
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
+            var hasBuffTristE = minion.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
 
             if (useE && E.IsReady())
-            {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
+            {            
                 if (minion == null) return;
                 E.Cast(minion);
             }
-            if (useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && hasBuffTristE)
             {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
                 if (minion == null) return;
                 Q.Cast();
             }

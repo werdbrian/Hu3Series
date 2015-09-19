@@ -43,12 +43,12 @@ namespace EzrealHu3
             Bootstrap.Init(null);
 
             Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
-            W = new Spell.Skillshot(SpellSlot.W, 790, SkillShotType.Linear, (int)0.25f, 1600, (int)80f);
+            W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, (int)0.25f, 1600, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.7");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.8");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -159,11 +159,11 @@ namespace EzrealHu3
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(Q.Range))
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
                 }
@@ -181,11 +181,11 @@ namespace EzrealHu3
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
                 }

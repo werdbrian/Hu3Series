@@ -48,7 +48,6 @@ namespace TristanaHu3
             TristanaMenu.AddGroupLabel("Tristana Hu3 1.5");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
-
             SettingsMenu = TristanaMenu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");

@@ -48,7 +48,7 @@ namespace TristanaHu3
             R = new Spell.Targeted(SpellSlot.R, 900);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 1.0");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.1");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
 
@@ -57,7 +57,6 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
-            SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
@@ -90,19 +89,12 @@ namespace TristanaHu3
             }
 
         }
-        //Damages
-        public static float WDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 80, 105, 130, 155, 180 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
-        }
+        //Damages      
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1.0 * _Player.FlatMagicDamageMod));
         }
-        // Get buff
-
         private static void KillSteal()
         {
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
@@ -119,7 +111,6 @@ namespace TristanaHu3
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
@@ -130,10 +121,6 @@ namespace TristanaHu3
                 if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast();
-                }
-                if (useR && R.IsReady() && R.Cast(target) && target.Health <= RDamage(target))
-                {
-                    R.Cast(target);
                 }
             }
         }

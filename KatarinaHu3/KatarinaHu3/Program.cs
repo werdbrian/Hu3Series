@@ -45,7 +45,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.8");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.9");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -79,8 +79,6 @@ namespace KatarinaHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
-            if (_Player.IsDead) return;
-
             CheckUlt();
 
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
@@ -172,7 +170,7 @@ namespace KatarinaHu3
                 {
                     Q.Cast(target);
                 }
-                if (E.IsReady() && useE && target.IsValidTarget(W.Range))
+                if (E.IsReady() && useE && target.IsValidTarget(E.Range))
                 {
                     E.Cast(target);
                 }
@@ -187,6 +185,7 @@ namespace KatarinaHu3
                 {
                     Orbwalker.DisableAttacking = true;
                     Orbwalker.DisableMovement = true;
+
                     R.Cast();
                 }
             }
@@ -210,12 +209,7 @@ namespace KatarinaHu3
         }
         private static void CheckUlt()
         {
-            if (_Player.HasBuff("katarinarsound"))
-            {
-                Orbwalker.DisableAttacking = true;
-                Orbwalker.DisableMovement = true;
-            }
-            else
+            if (!_Player.HasBuff("katarinarsound"))
             {
                 Orbwalker.DisableAttacking = false;
                 Orbwalker.DisableMovement = false;

@@ -139,7 +139,7 @@ namespace KatarinaHu3
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
                 if (target == null) return;
-                if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
+                else if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
@@ -165,7 +165,7 @@ namespace KatarinaHu3
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
-                if (useQ && target.IsValidTarget(Q.Range) && inult == false)
+                else if (useQ && target.IsValidTarget(Q.Range) && inult == false)
                 {
                     Q.Cast(target);
                 }
@@ -197,7 +197,7 @@ namespace KatarinaHu3
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
-                if (useQ && target.IsValidTarget(Q.Range))
+                else if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
@@ -215,7 +215,7 @@ namespace KatarinaHu3
         private static void CheckUlt()
         {
             if (_Player.IsDead) return;
-            if (!_Player.HasBuff("katarinarsound"))
+            else if (!_Player.HasBuff("katarinarsound"))
             {
                 Orbwalker.DisableAttacking = false;
                 Orbwalker.DisableMovement = false;
@@ -231,11 +231,11 @@ namespace KatarinaHu3
         private static void LastHit()
         {
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
-            {
-                if (minion == null || inult == true) return;
+            {                
                 var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
-                var hasBuff = minion.HasBuff("katarinaqmark");             
-                if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                var hasBuff = minion.HasBuff("katarinaqmark");
+                if (minion == null || inult == true) return;
+                else if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
                     Q.Cast(minion);
@@ -260,11 +260,11 @@ namespace KatarinaHu3
         {
 
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
-            {
-                if (minion == null || inult == true) return;
+            {                
                 var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
-                if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                if (minion == null || inult == true) return;
+                else if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
                     Q.Cast(minion);

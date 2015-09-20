@@ -179,29 +179,31 @@ namespace TristanaHu3
         }
         private static void LaneClear()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
+            foreach(var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
+                {
 
-            if (useE && E.IsReady())
-            {
-                if (minion == null) return;
-                E.Cast(minion);
-            }
-            if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
-            {
-                if (minion == null) return;
-                Q.Cast();
-            }
-            foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
-            {
-                if (!tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
+                if (useE && E.IsReady())
                 {
-                    E.Cast(tower);
+                    if (minion == null) return;
+                    E.Cast(minion);
                 }
-                if (tower.HasBuff("tristanaecharge"))
+                if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
                 {
+                    if (minion == null) return;
                     Q.Cast();
+                }
+                foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
+                {
+                    if (!tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
+                    {
+                        E.Cast(tower);
+                    }
+                    if (tower.HasBuff("tristanaecharge"))
+                    {
+                        Q.Cast();
+                    }
                 }
             }
         }

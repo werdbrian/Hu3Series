@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.6");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.7");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -198,7 +198,6 @@ namespace KatarinaHu3
             }
         private static void Harass()
         {
-
                 var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
@@ -231,8 +230,8 @@ namespace KatarinaHu3
         }
         private static void LastHit()
         {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < rangeQ()).OrderBy(a => a.Health).FirstOrDefault();                
-                var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
+            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.IsValidTarget(Q.Range)).OrderBy(a => a.Health).FirstOrDefault();
+            var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
                 if (minion == null || inult == true) return;
                 if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
@@ -257,8 +256,7 @@ namespace KatarinaHu3
             }
         private static void LaneClear()
         {
-
-            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < rangeQ()).OrderBy(a => a.Health).FirstOrDefault();
+            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.IsValidTarget(Q.Range)).OrderBy(a => a.Health).FirstOrDefault();
             var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
             var hasBuff = minion.HasBuff("katarinaqmark");
             if (minion == null || inult == true) return;

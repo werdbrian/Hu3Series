@@ -57,6 +57,11 @@ namespace KatarinaHu3
             SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
+            SettingsMenu.AddLabel("LastHit");
+            SettingsMenu.Add("LaneHit", new CheckBox("Use Smart LastHitting"));
+            SettingsMenu.AddLabel("LaneClear");
+            SettingsMenu.Add("LaneClearQ", new CheckBox("Use Q LaneClear"));
+            SettingsMenu.Add("LaneClearW", new CheckBox("Use W LaneClear"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
@@ -77,6 +82,11 @@ namespace KatarinaHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
+            CheckUlt();
+            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
+            {
+                KillSteal();
+            }
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -89,9 +99,9 @@ namespace KatarinaHu3
             {
                 LaneClear();
             }
-            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
             {
-                KillSteal();
+                LastHit();
             }
         }
         //Damages      
@@ -120,7 +130,7 @@ namespace KatarinaHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 35 * 8, 55 * 8, 75 * 8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
         }
-        private static void Killsteal()
+        private static void KillSteal()
         {
             var useKS = SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue;
             var useEW = SettingsMenu["killstealEW"].Cast<CheckBox>().CurrentValue;
@@ -155,19 +165,23 @@ namespace KatarinaHu3
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
-                if (useQ && target.IsValidTarget(Q.Range))
+                if (useQ && target.IsValidTarget(Q.Range) && inult == false)
                 {
                     Q.Cast(target);
                 }
-                if (useE && target.IsValidTarget(Q.Range))
+                if (useE && target.IsValidTarget(W.Range) && inult == false)
                 {
                     E.Cast(target);
                 }
-                if (useW && target.IsValidTarget(Q.Range))
+                if (useW && target.IsValidTarget(E.Range) && inult == false)
                 {
                     W.Cast();
                 }
-                if (useR && target.IsValidTarget(Q.Range))
+                if (useR && target.IsValidTarget(R.Range) 
+                    && !Q.IsReady()
+                    && !W.IsReady()
+                    && !E.IsReady()
+                    && inult == false)
                 {
                     R.Cast();
                     inult = true;
@@ -197,6 +211,85 @@ namespace KatarinaHu3
                 }
             }
 
+        }
+        private static void CheckUlt()
+        {
+            if (_Player.IsDead) return;
+            if (!_Player.HasBuff("katarinarsound"))
+            {
+                Orbwalker.DisableAttacking = false;
+                Orbwalker.DisableMovement = false;
+                inult = false;
+            }
+            else
+            {
+                Orbwalker.DisableAttacking = true;
+                Orbwalker.DisableMovement = true;
+                inult = true;
+            }
+        }
+        private static void LastHit()
+        {
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
+            {
+                var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
+                var hasBuff = minion.HasBuff("katarinaqmark");             
+                if (minion == null) return;
+                if (LH && Q.IsReady() && W.IsReady())
+                {
+                    
+                    E.Cast(minion);
+                }
+            }
+        }
+        private static void LaneClear()
+        {
+            
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
+            {
+                var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
+                var useE = SettingsMenu["laneclearW"].Cast<CheckBox>().CurrentValue;
+                if (useE && E.IsReady())
+                {
+                    if (minion == null) return;
+                    E.Cast(minion);
+                }
+                if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
+                {
+                    if (minion == null) return;
+                    Q.Cast();
+                }
+                foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
+                {
+                    if (!tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
+                    {
+                        E.Cast(tower);
+                    }
+                    if (tower.HasBuff("tristanaecharge"))
+                    {
+                        Q.Cast();
+                    }
+                }
+            }
+        }
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.Red, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
+            }
+            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
+            }
+            if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
+            }
+            if (SettingsMenu["drawR"].Cast<CheckBox>().CurrentValue)
+            {
+                new Circle() { Color = Color.White, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
+            }
         }
     }
 }

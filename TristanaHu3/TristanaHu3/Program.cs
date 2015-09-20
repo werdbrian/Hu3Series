@@ -152,7 +152,7 @@ namespace TristanaHu3
                 {
                     E.Cast(target);
                 }
-                if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+                if (useQ && Q.IsReady())
                 {
                     Q.Cast();
                 }

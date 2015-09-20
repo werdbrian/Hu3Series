@@ -46,8 +46,8 @@ namespace KatarinaHu3
             E = new Spell.Targeted(SpellSlot.E, 700);
             R = new Spell.Active(SpellSlot.R, 540);
 
-            KatarinaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            KatarinaMenu.AddGroupLabel("Tristana Hu3 1.8");
+            KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.0");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -231,9 +231,9 @@ namespace KatarinaHu3
         {
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {
+                if (minion == null || inult == true) return;
                 var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");             
-                if (minion == null) return;
                 if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
@@ -260,9 +260,9 @@ namespace KatarinaHu3
 
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {
+                if (minion == null || inult == true) return;
                 var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
-                if (minion == null) return;
                 if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {

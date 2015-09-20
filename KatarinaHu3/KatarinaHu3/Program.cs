@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.5");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.6");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -151,24 +151,23 @@ namespace KatarinaHu3
                 {
                     E.Cast(target);
                     W.Cast();
-                    Chat.Print("KS");
+                    Chat.Print("KS EW");
                 }
                 if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                     Q.Cast(target);
-                    Chat.Print("KS");
+                    Chat.Print("KS EWQ");
                 }
                 if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
                 {
                     Q.Cast(target);
-                    Chat.Print("KS");
+                    Chat.Print("KS Q");
                 }
             }
         private static void Combo()
         {
-
                 var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
@@ -178,17 +177,14 @@ namespace KatarinaHu3
                 if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
-                    Chat.Print("Combo");
                 }
                 if (useE && target.IsValidTarget(W.Range))
                 {
                     E.Cast(target);
-                    Chat.Print("Combo");
                 }
                 if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
-                    Chat.Print("Combo");
                 }
                 if (useR && target.IsValidTarget(R.Range) 
                     && !Q.IsReady()
@@ -198,7 +194,6 @@ namespace KatarinaHu3
                 {
                     R.Cast();
                     inult = true;
-                    Chat.Print("Combo");
                 }
             }
         private static void Harass()
@@ -211,12 +206,10 @@ namespace KatarinaHu3
                 if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
-                    Chat.Print("Harass");
                 }
                 if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
-                    Chat.Print("Harass");
                 }
             }
         private static void CheckUlt()
@@ -246,7 +239,6 @@ namespace KatarinaHu3
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
                     Q.Cast(minion);
-                    Chat.Print("LastHit");
                     if (hasBuff)
                     {
                         W.Cast();
@@ -256,13 +248,11 @@ namespace KatarinaHu3
                     && minion.Health < QDamage(minion))
                     {
                         Q.Cast(minion);
-                    Chat.Print("LastHit");
                 }
                 if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < WDamage(minion))
                 {
                     W.Cast();
-                    Chat.Print("LastHit");
                 }
             }
         private static void LaneClear()
@@ -276,7 +266,6 @@ namespace KatarinaHu3
                 && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
             {
                 Q.Cast(minion);
-                Chat.Print("LastHit");
                 if (hasBuff)
                 {
                     W.Cast();
@@ -286,13 +275,11 @@ namespace KatarinaHu3
                 && minion.Health < QDamage(minion))
             {
                 Q.Cast(minion);
-                Chat.Print("LastHit");
             }
             if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
                 && minion.Health < WDamage(minion))
             {
                 W.Cast();
-                Chat.Print("LastHit");
             }
         }
         private static void Drawing_OnDraw(EventArgs args)

@@ -45,7 +45,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.6");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.7");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -80,7 +80,9 @@ namespace KatarinaHu3
         private static void Game_OnTick(EventArgs args)
         {
             if (_Player.IsDead) return;
+
             CheckUlt();
+
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
@@ -158,7 +160,7 @@ namespace KatarinaHu3
             }
         }
         private static void Combo()
-        {          
+        {
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
                 if (target == null) return;
@@ -191,7 +193,7 @@ namespace KatarinaHu3
         }
         private static void Harass()
         {
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead))
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
@@ -233,15 +235,6 @@ namespace KatarinaHu3
             var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
                 if (minion == null) return;
-                if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
-                    && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
-                {
-                    Q.Cast(minion);
-                    if (hasBuff)
-                    {
-                        W.Cast();
-                    }                
-                }
                 if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
                     && minion.Health < QDamage(minion))
                     {
@@ -259,15 +252,6 @@ namespace KatarinaHu3
             var LH = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
             var hasBuff = minion.HasBuff("katarinaqmark");
             if (minion == null) return;
-            if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
-                && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
-            {
-                Q.Cast(minion);
-                if (hasBuff)
-                {
-                    W.Cast();
-                }
-            }
             if (LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
                 && minion.Health < QDamage(minion))
             {

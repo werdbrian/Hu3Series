@@ -136,7 +136,7 @@ namespace EzrealHu3
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 350, 500, 650 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 320, 470, 600 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
         }
         private static void KillSteal()
         {

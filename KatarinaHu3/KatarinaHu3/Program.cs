@@ -47,7 +47,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.0");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.1");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -63,7 +63,7 @@ namespace KatarinaHu3
             SettingsMenu.Add("LaneClear", new CheckBox("Use Smart LaneClearing"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
+            SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealEW", new CheckBox("Use E->W KillSteal"));
@@ -87,19 +87,19 @@ namespace KatarinaHu3
             {
                 KillSteal();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
+            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
+            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
             {
                 LaneClear();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
+            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
             {
                 LastHit();
             }
@@ -144,13 +144,13 @@ namespace KatarinaHu3
                     E.Cast(target);
                     W.Cast();
                 }
-                if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
+                else if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                     Q.Cast(target);
                 }
-                if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
+                else if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
                 {
                     Q.Cast(target);
                 }
@@ -169,15 +169,15 @@ namespace KatarinaHu3
                 {
                     Q.Cast(target);
                 }
-                if (useE && target.IsValidTarget(W.Range) && inult == false)
+                else if (useE && target.IsValidTarget(W.Range) && inult == false)
                 {
                     E.Cast(target);
                 }
-                if (useW && target.IsValidTarget(E.Range) && inult == false)
+                else if (useW && target.IsValidTarget(W.Range) && inult == false)
                 {
                     W.Cast();
                 }
-                if (useR && target.IsValidTarget(R.Range) 
+                else if (useR && target.IsValidTarget(R.Range) 
                     && !Q.IsReady()
                     && !W.IsReady()
                     && !E.IsReady()
@@ -201,11 +201,11 @@ namespace KatarinaHu3
                 {
                     Q.Cast(target);
                 }
-                if (useE && target.IsValidTarget(Q.Range))
+                else if (useE && target.IsValidTarget(E.Range))
                 {
                     E.Cast(target);
                 }
-                if (useW && target.IsValidTarget(Q.Range))
+                else if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
                 }
@@ -244,12 +244,12 @@ namespace KatarinaHu3
                         W.Cast();
                     }                
                 }
-                if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                else if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
                     && minion.Health < QDamage(minion))
                     {
                         Q.Cast(minion);
                     }
-                if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
+                else if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < WDamage(minion))
                 {
                     W.Cast();
@@ -273,12 +273,12 @@ namespace KatarinaHu3
                         W.Cast();
                     }
                 }
-                if (LC && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                else if (LC && Q.IsReady() && minion.IsValidTarget(Q.Range)
                     && minion.Health < QDamage(minion))
                 {
                     Q.Cast(minion);
                 }
-                if (LC && W.IsReady() && minion.IsValidTarget(W.Range)
+                else if (LC && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < WDamage(minion))
                 {
                     W.Cast();

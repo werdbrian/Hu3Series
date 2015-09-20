@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.1");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.2");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -81,7 +81,7 @@ namespace KatarinaHu3
         private static void Game_OnTick(EventArgs args)
         {
 
-            //CheckUlt();
+            CheckUlt();
 
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
@@ -130,22 +130,14 @@ namespace KatarinaHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 35 * 8, 55 * 8, 75 * 8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
         }
-        //Ranges
-        public static float rangeQ()
-        {
-            if (Q.IsReady())
-            {
-                return Q.Range;
-            }
-            return _Player.AttackRange;
-        }
         private static void KillSteal()
         {
             var useKS = SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue;
             var useEW = SettingsMenu["killstealEW"].Cast<CheckBox>().CurrentValue;
             var useEWQ = SettingsMenu["killstealEWQ"].Cast<CheckBox>().CurrentValue;
             var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
-            var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            {
                 if (target == null) return;
                 if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
                 {
@@ -166,6 +158,7 @@ namespace KatarinaHu3
                     Chat.Print("KS Q");
                 }
             }
+        }
         private static void Combo()
         {          
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))

@@ -119,7 +119,7 @@ namespace EzrealHu3
             }
             if (ActivatorMenu["useitems"].Cast<CheckBox>().CurrentValue)
             {
-                hpPOT();
+                Chat.Print(" Use items");
             }
         }
         //Damages
@@ -149,14 +149,17 @@ namespace EzrealHu3
                 if (Q.IsReady() && useQ && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
+                    Chat.Print(" KSQ");
                 }
                 if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
+                    Chat.Print(" KSW");
                 }
                 if (R.IsReady() && useR && R.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(2000))
                 {
                     R.Cast(target);
+                    Chat.Print(" KSR");
                 }
             }
         }
@@ -172,14 +175,17 @@ namespace EzrealHu3
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
                     Q.Cast(target);
+                    Chat.Print("Q");
                 }
                 if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
+                    Chat.Print("W");
                 }
                 if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target) && target.IsValidTarget(R.Range))
                 {
                     R.Cast(target);
+                    Chat.Print("R");
                 }
             }
         }
@@ -195,10 +201,12 @@ namespace EzrealHu3
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
+                    Chat.Print("Harass Q");
                 }
                 if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
+                    Chat.Print("Harass W");
                 }
             }
         }
@@ -207,12 +215,13 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            foreach (var target in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsValidTarget(550)))
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsValidTarget(550)))
             {
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && target.Health <= QDamage(target))
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
                 {
-                    if (target == null) return;
-                    Q.Cast(target);
+                    if (minion == null) return;
+                    Q.Cast(minion);
+                    Chat.Print("LastHit Q");
                 }
 
             }
@@ -228,68 +237,11 @@ namespace EzrealHu3
                 {
                     if (minion == null) return;
                     Q.Cast(minion);
+                    Chat.Print("LaneClear Q");
                 }
 
             }
         }
-        private static void Items()
-        {
-
-
-            var useManaP = ActivatorMenu["manaP"].Cast<CheckBox>().CurrentValue;
-            var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
-            var changeT = ActivatorMenu["changeT"].Cast<Slider>().CurrentValue;
-            var changeS = ActivatorMenu["changeS"].Cast<Slider>().CurrentValue;
-            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
-            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
-            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
-            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
-            var useCleanser = ActivatorMenu["cleanser"].Cast<CheckBox>().CurrentValue;
-            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
-            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
-            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
-
-            var manaP = new Item((int)ItemId.Mana_Potion);
-            var trinketG = new Item((int)ItemId.Warding_Totem_Trinket);
-            var trinketB = new Item((int)ItemId.Scrying_Orb_Trinket);
-
-
-            if (useManaP && Player.Instance.ManaPercent < manaS)
-            {
-                manaP.Cast();
-            }
-            if (trinketG.IsOwned() && !trinketB.IsOwned() && Player.Instance.Level == changeS && Shop.IsOpen)
-            {
-                Shop.SellItem(ItemId.Warding_Totem_Trinket);
-                Shop.BuyItem(ItemId.Scrying_Orb_Trinket);
-            }
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
-            {
-                if (target.HealthPercent <= bladeS && blade1.IsOwned() && blade1.IsReady())
-                {
-                    blade1.Cast(target);
-                }
-                if (target.HealthPercent <= bladeS && blade2.IsOwned() && blade2.IsReady())
-                {
-                    blade2.Cast(target);
-                }
-                if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
-                {
-                    youmu.Cast();
-                }
-            }
-        }
-        private static void hpPOT()
-        {
-            var useHealthP = ActivatorMenu["healthP"].Cast<CheckBox>().CurrentValue;
-            var healthS = ActivatorMenu["healthS"].Cast<Slider>().CurrentValue;
-            var healthP = new Item((int)ItemId.Health_Potion);
-            if (useHealthP && Player.Instance.HealthPercent < healthS && healthP.IsOwned())
-            {
-                healthP.Cast();
-            }
-        }
-
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)

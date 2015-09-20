@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.3");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.4");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");

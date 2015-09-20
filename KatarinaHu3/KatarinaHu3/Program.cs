@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.4");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.5");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -130,14 +130,22 @@ namespace KatarinaHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 35 * 8, 55 * 8, 75 * 8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
         }
+        //Ranges
+        public static float rangeQ()
+        {
+            if (Q.IsReady())
+            {
+                return Q.Range;
+            }
+            return _Player.AttackRange;
+        }
         private static void KillSteal()
         {
             var useKS = SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue;
             var useEW = SettingsMenu["killstealEW"].Cast<CheckBox>().CurrentValue;
             var useEWQ = SettingsMenu["killstealEWQ"].Cast<CheckBox>().CurrentValue;
             var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
-            {
+            var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
                 if (target == null) return;
                 if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
                 {
@@ -158,12 +166,10 @@ namespace KatarinaHu3
                     Chat.Print("KS");
                 }
             }
-        }
         private static void Combo()
         {
-            
-            foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
-            {
+
+                var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
@@ -195,13 +201,10 @@ namespace KatarinaHu3
                     Chat.Print("Combo");
                 }
             }
-
-        }
         private static void Harass()
         {
-            
-            foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
-            {
+
+                var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
@@ -216,8 +219,6 @@ namespace KatarinaHu3
                     Chat.Print("Harass");
                 }
             }
-
-        }
         private static void CheckUlt()
         {
             Chat.Print("Check Ult");
@@ -236,9 +237,8 @@ namespace KatarinaHu3
             }
         }
         private static void LastHit()
-        {            
-            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
-            {                
+        {
+                var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < rangeQ()).OrderBy(a => a.Health).FirstOrDefault();                
                 var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
                 if (minion == null || inult == true) return;
@@ -265,37 +265,34 @@ namespace KatarinaHu3
                     Chat.Print("LastHit");
                 }
             }
-        }
         private static void LaneClear()
         {
-            
-            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
-            {                
-                var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
-                var hasBuff = minion.HasBuff("katarinaqmark");
-                if (minion == null || inult == true) return;
-                if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
-                    && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
-                {
-                    Q.Cast(minion);
-                    Chat.Print("LaneClear");
-                    if (hasBuff)
-                    {
-                        W.Cast();
-                    }
-                }
-                if (LC && Q.IsReady() && minion.IsValidTarget(Q.Range)
-                    && minion.Health < QDamage(minion))
-                {
-                    Q.Cast(minion);
-                    Chat.Print("LaneClear");
-                }
-                if (LC && W.IsReady() && minion.IsValidTarget(W.Range)
-                    && minion.Health < WDamage(minion))
+
+            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < rangeQ()).OrderBy(a => a.Health).FirstOrDefault();
+            var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
+            var hasBuff = minion.HasBuff("katarinaqmark");
+            if (minion == null || inult == true) return;
+            if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
+            {
+                Q.Cast(minion);
+                Chat.Print("LastHit");
+                if (hasBuff)
                 {
                     W.Cast();
-                    Chat.Print("LaneClear");
                 }
+            }
+            if (LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                && minion.Health < QDamage(minion))
+            {
+                Q.Cast(minion);
+                Chat.Print("LastHit");
+            }
+            if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
+                && minion.Health < WDamage(minion))
+            {
+                W.Cast();
+                Chat.Print("LastHit");
             }
         }
         private static void Drawing_OnDraw(EventArgs args)

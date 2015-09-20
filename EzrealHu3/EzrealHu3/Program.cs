@@ -172,22 +172,14 @@ namespace EzrealHu3
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
-            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
-            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
-            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
-            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
-            var useCleanser = ActivatorMenu["Cleanse"].Cast<CheckBox>().CurrentValue;
-            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
-            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
-            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range))
+                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
                 {
                     Q.Cast(target);
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
+                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
                 }
@@ -205,6 +197,7 @@ namespace EzrealHu3
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
             {
+                if (target == null) return;
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
@@ -220,12 +213,14 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsValidTarget(550)))
             {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && a.Health <= QDamage(a));
-                if (minion == null) return;
-                Q.Cast(minion);
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+                {
+                    if (minion == null) return;
+                    Q.Cast(minion);
+                }
+
             }
         }
         private static void LaneClear()
@@ -233,11 +228,14 @@ namespace EzrealHu3
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
 
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsValidTarget(550)))
             {
-                var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy);
-                if (minion == null) return;
-                Q.Cast(minion);
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
+                {
+                    if (minion == null) return;
+                    Q.Cast(minion);
+                }
+
             }
         }
         private static void Items()
@@ -264,9 +262,12 @@ namespace EzrealHu3
 
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
-                if (target.HealthPercent <= bladeS && (blade1.IsOwned() || blade2.IsOwned()) && (blade1.IsReady() || blade2.IsReady()))
+                if (target.HealthPercent <= bladeS && blade1.IsOwned() && blade1.IsReady())
                 {
                     blade1.Cast(target);
+                }
+                if (target.HealthPercent <= bladeS && blade2.IsOwned() && blade2.IsReady())
+                {
                     blade2.Cast(target);
                 }
                 if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
@@ -283,7 +284,7 @@ namespace EzrealHu3
             {
                 manaP.Cast();
             }
-            if (trinketG.IsOwned() && !trinketB.IsOwned() && Player.Instance.Level == changeS)
+            if (trinketG.IsOwned() && !trinketB.IsOwned() && Player.Instance.Level == changeS && Shop.IsOpen)
             {
                 Shop.SellItem(ItemId.Warding_Totem_Trinket);
                 Shop.BuyItem(ItemId.Scrying_Orb_Trinket);

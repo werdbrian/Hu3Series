@@ -45,7 +45,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 Debug Edition 0.1");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 Debug Edition 0.2");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -119,7 +119,7 @@ namespace EzrealHu3
             }
             if (ActivatorMenu["useitems"].Cast<CheckBox>().CurrentValue)
             {
-                Chat.Print(" Use items");
+                Items();
             }
         }
         //Damages
@@ -239,8 +239,19 @@ namespace EzrealHu3
                     Q.Cast(minion);
                     Chat.Print("LaneClear Q");
                 }
-
             }
+        }
+        private static void Items()
+        {
+            var healthP = SettingsMenu["helthP"].Cast<CheckBox>().CurrentValue;
+            var healthS = SettingsMenu["helthS"].Cast<Slider>().CurrentValue;
+            var healthPot = new Item((int)ItemId.Health_Potion);
+            if (_Player.HealthPercent < healthS && healthPot.IsOwned())
+            {
+                Chat.Print("Use Pot");
+                healthPot.Cast();
+            }
+
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

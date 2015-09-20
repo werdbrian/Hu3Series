@@ -262,7 +262,7 @@ namespace KatarinaHu3
         }
         private static void LaneClear()
         {
-            Chat.Print("Lane Clear");
+            Chat.Print("LaneClear");
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {                
                 var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;

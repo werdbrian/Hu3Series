@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.7");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.8");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -167,13 +167,14 @@ namespace KatarinaHu3
                 }
             }
         private static void Combo()
-        {
-                var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
+        {          
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            {
+                if (target == null || inult == true) return;
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
-                if (target == null || inult == true) return;
                 if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
@@ -186,7 +187,7 @@ namespace KatarinaHu3
                 {
                     W.Cast();
                 }
-                if (useR && target.IsValidTarget(R.Range) 
+                if (useR && target.IsValidTarget(R.Range)
                     && !Q.IsReady()
                     && !W.IsReady()
                     && !E.IsReady()
@@ -196,9 +197,11 @@ namespace KatarinaHu3
                     inult = true;
                 }
             }
+        }
         private static void Harass()
         {
-                var target = TargetSelector.GetTarget(rangeQ(), DamageType.Magical);
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead))
+            {
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
@@ -211,6 +214,7 @@ namespace KatarinaHu3
                     W.Cast();
                 }
             }
+        }
         private static void CheckUlt()
         {
             Chat.Print("Check Ult");

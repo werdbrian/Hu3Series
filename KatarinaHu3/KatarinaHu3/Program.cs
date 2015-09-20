@@ -20,7 +20,6 @@ namespace KatarinaHu3
         public static Spell.Targeted E;
         public static Spell.Active R;
         public static Menu KatarinaMenu, SettingsMenu;
-        public static bool inult = false;
 
 
         static void Main(string[] args)
@@ -46,7 +45,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.5");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.6");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -80,9 +79,8 @@ namespace KatarinaHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
-
+            if (_Player.IsDead) return;
             CheckUlt();
-
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
@@ -108,27 +106,27 @@ namespace KatarinaHu3
         public static float QDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 60, 85, 110, 135, 160 }[Program.Q.Level] + 0.45 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 50, 75, 100, 125, 150 }[Program.Q.Level] + 0.45 * _Player.FlatMagicDamageMod));
         }
         public static float Q2Damage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 15, 30, 45, 60, 75 }[Program.Q.Level] + 0.15 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 12, 25, 40, 55, 70 }[Program.Q.Level] + 0.15 * _Player.FlatMagicDamageMod));
         }
         public static float WDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 40, 75, 110, 145, 180 }[Program.W.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.6 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 35, 70, 105, 140, 175 }[Program.W.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.6 * _Player.FlatPhysicalDamageMod));
         }
         public static float EDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 40, 70, 100, 130, 160 }[Program.E.Level] + 0.25 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 35, 65, 95, 125, 155 }[Program.E.Level] + 0.25 * _Player.FlatMagicDamageMod));
         }
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 35 * 8, 55 * 8, 75 * 8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 34 * 8, 54 * 8, 74 * 8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
         }
         private static void KillSteal()
         {
@@ -163,7 +161,7 @@ namespace KatarinaHu3
         {          
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
-                if (target == null || inult == true) return;
+                if (target == null) return;
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
@@ -183,12 +181,10 @@ namespace KatarinaHu3
                 if (useR && target.IsValidTarget(R.Range)
                     && !Q.IsReady()
                     && !W.IsReady()
-                    && !E.IsReady()
-                    && inult == false)
+                    && !E.IsReady())
                 {
                     Orbwalker.DisableAttacking = true;
                     Orbwalker.DisableMovement = true;
-                    inult = true;
                     R.Cast();
                 }
             }
@@ -199,7 +195,7 @@ namespace KatarinaHu3
             {
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-                if (target == null || inult == true) return;
+                if (target == null) return;
                 if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
@@ -212,26 +208,31 @@ namespace KatarinaHu3
         }
         private static void CheckUlt()
         {
-            if (_Player.IsDead) return;
-            if (!_Player.HasBuff("katarinarsound"))
-            {
-                Orbwalker.DisableAttacking = false;
-                Orbwalker.DisableMovement = false;
-                inult = false;
-            }
-            else
+            if (_Player.HasBuff("katarinarsound"))
             {
                 Orbwalker.DisableAttacking = true;
                 Orbwalker.DisableMovement = true;
-                inult = true;
             }
+            else
+            {
+                Orbwalker.DisableAttacking = false;
+                Orbwalker.DisableMovement = false;
+            }
+        }
+        public static float qRange()
+        {
+            if (Q.IsReady())
+            {
+                return Q.Range;
+            }
+            return _Player.GetAutoAttackRange();
         }
         private static void LastHit()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.IsValidTarget(Q.Range)).OrderBy(a => a.Health).FirstOrDefault();
+            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < qRange()).OrderBy(a => a.Health).FirstOrDefault();
             var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
-                if (minion == null || inult == true) return;
+                if (minion == null) return;
                 if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
@@ -254,10 +255,10 @@ namespace KatarinaHu3
             }
         private static void LaneClear()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.IsValidTarget(Q.Range)).OrderBy(a => a.Health).FirstOrDefault();
-            var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
+            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < qRange()).OrderBy(a => a.Health).FirstOrDefault();
+            var LH = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
             var hasBuff = minion.HasBuff("katarinaqmark");
-            if (minion == null || inult == true) return;
+            if (minion == null) return;
             if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                 && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
             {

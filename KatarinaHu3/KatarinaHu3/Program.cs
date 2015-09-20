@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.3");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.4");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -139,20 +139,20 @@ namespace KatarinaHu3
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
                 if (target == null) return;
-                if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
+                if (W.IsReady() && E.IsReady() && useKS && useEW && target.Health < EDamage(target) + WDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                     Chat.Print("KS EW");
                 }
-                if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
+                if (Q.IsReady() && W.IsReady() && E.IsReady() && useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                     Q.Cast(target);
                     Chat.Print("KS EWQ");
                 }
-                if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
+                if (Q.IsReady() && useKS && useQ && target.Health < QDamage(target) + WDamage(target))
                 {
                     Q.Cast(target);
                     Chat.Print("KS Q");

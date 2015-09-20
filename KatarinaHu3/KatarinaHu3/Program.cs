@@ -143,22 +143,25 @@ namespace KatarinaHu3
                 {
                     E.Cast(target);
                     W.Cast();
+                    Chat.Print("KS");
                 }
                 if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                     Q.Cast(target);
+                    Chat.Print("KS");
                 }
                 if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
                 {
                     Q.Cast(target);
+                    Chat.Print("KS");
                 }
             }
         }
         private static void Combo()
         {
-            Chat.Print("Combo");
+            
             foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
             {
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
@@ -169,14 +172,17 @@ namespace KatarinaHu3
                 if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
+                    Chat.Print("Combo");
                 }
                 if (useE && target.IsValidTarget(W.Range))
                 {
                     E.Cast(target);
+                    Chat.Print("Combo");
                 }
                 if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
+                    Chat.Print("Combo");
                 }
                 if (useR && target.IsValidTarget(R.Range) 
                     && !Q.IsReady()
@@ -186,30 +192,28 @@ namespace KatarinaHu3
                 {
                     R.Cast();
                     inult = true;
+                    Chat.Print("Combo");
                 }
             }
 
         }
         private static void Harass()
         {
-            Chat.Print("Harass");
+            
             foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
             {
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-                var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
                 if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
-                }
-                if (useE && target.IsValidTarget(E.Range))
-                {
-                    E.Cast(target);
+                    Chat.Print("Harass");
                 }
                 if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
+                    Chat.Print("Harass");
                 }
             }
 
@@ -232,60 +236,65 @@ namespace KatarinaHu3
             }
         }
         private static void LastHit()
-        {
-            Chat.Print("LastHit");
+        {            
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {                
                 var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
                 if (minion == null || inult == true) return;
-                else if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
                     Q.Cast(minion);
+                    Chat.Print("LastHit");
                     if (hasBuff)
                     {
                         W.Cast();
                     }                
                 }
-                else if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
                     && minion.Health < QDamage(minion))
                     {
                         Q.Cast(minion);
-                    }
-                else if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
+                    Chat.Print("LastHit");
+                }
+                if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < WDamage(minion))
                 {
                     W.Cast();
+                    Chat.Print("LastHit");
                 }
             }
         }
         private static void LaneClear()
         {
-            Chat.Print("LaneClear");
+            
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {                
                 var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
                 if (minion == null || inult == true) return;
-                else if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
                     Q.Cast(minion);
+                    Chat.Print("LaneClear");
                     if (hasBuff)
                     {
                         W.Cast();
                     }
                 }
-                else if (LC && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                if (LC && Q.IsReady() && minion.IsValidTarget(Q.Range)
                     && minion.Health < QDamage(minion))
                 {
                     Q.Cast(minion);
+                    Chat.Print("LaneClear");
                 }
-                else if (LC && W.IsReady() && minion.IsValidTarget(W.Range)
+                if (LC && W.IsReady() && minion.IsValidTarget(W.Range)
                     && minion.Health < WDamage(minion))
                 {
                     W.Cast();
+                    Chat.Print("LaneClear");
                 }
             }
         }

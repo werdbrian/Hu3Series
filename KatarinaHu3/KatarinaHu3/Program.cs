@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.4");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.5");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -186,8 +186,10 @@ namespace KatarinaHu3
                     && !E.IsReady()
                     && inult == false)
                 {
-                    R.Cast();
+                    Orbwalker.DisableAttacking = true;
+                    Orbwalker.DisableMovement = true;
                     inult = true;
+                    R.Cast();
                 }
             }
         }

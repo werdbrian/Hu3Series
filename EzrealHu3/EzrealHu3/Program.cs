@@ -246,7 +246,7 @@ namespace EzrealHu3
             var healthP = SettingsMenu["helthP"].Cast<CheckBox>().CurrentValue;
             var healthS = SettingsMenu["helthS"].Cast<Slider>().CurrentValue;
             var healthPot = new Item((int)ItemId.Health_Potion);
-            if (_Player.HealthPercent < 99)
+            if (_Player.HealthPercent > 99)
             {
                 Chat.Print("Use Pot");
                 healthPot.Cast();

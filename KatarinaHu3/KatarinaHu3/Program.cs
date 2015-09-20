@@ -82,6 +82,7 @@ namespace KatarinaHu3
         private static void Game_OnTick(EventArgs args)
         {
             CheckUlt();
+
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();

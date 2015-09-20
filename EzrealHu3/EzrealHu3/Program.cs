@@ -18,7 +18,7 @@ namespace EzrealHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Menu EzrealMenu, SettingsMenu, ActivatorMenu;
+        public static Menu EzrealMenu, SettingsMenu;
 
 
         static void Main(string[] args)
@@ -45,7 +45,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 Debug Edition 0.4");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 2.0");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -73,23 +73,6 @@ namespace EzrealHu3
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
-            ActivatorMenu = EzrealMenu.AddSubMenu("Activator", "Activator");
-            ActivatorMenu.Add("useitems", new CheckBox("Use Activator"));
-            ActivatorMenu.AddGroupLabel("Potions Health");
-            ActivatorMenu.Add("healthP", new CheckBox("Health Potion", true));
-            ActivatorMenu.Add("healthS", new Slider("Min HP %", 20));
-            ActivatorMenu.AddGroupLabel("Potions Mana");
-            ActivatorMenu.Add("manaP", new CheckBox("Mana Potion", true));
-            ActivatorMenu.Add("manaS", new Slider("Min Mana %", 20));
-            ActivatorMenu.AddGroupLabel("Items");
-            ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
-            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
-            ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
-            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
-            ActivatorMenu.Add("changeT", new CheckBox("Change Trinket To Blue"));
-            ActivatorMenu.Add("changeS", new Slider("▲ Level To Change Trinket ▲", 6, 1, 18));
-            ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
-
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -116,10 +99,6 @@ namespace EzrealHu3
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
-            }
-            if (ActivatorMenu["useitems"].Cast<CheckBox>().CurrentValue)
-            {
-                Items();
             }
         }
         //Damages
@@ -149,17 +128,14 @@ namespace EzrealHu3
                 if (Q.IsReady() && useQ && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
-                    Chat.Print(" KSQ");
                 }
                 if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
-                    Chat.Print(" KSW");
                 }
                 if (R.IsReady() && useR && R.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(2000))
                 {
                     R.Cast(target);
-                    Chat.Print(" KSR");
                 }
             }
         }
@@ -201,12 +177,10 @@ namespace EzrealHu3
                 if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
                 {
                     Q.Cast(target);
-                    Chat.Print("Harass Q");
                 }
                 if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
                 {
                     W.Cast(target);
-                    Chat.Print("Harass W");
                 }
             }
         }
@@ -221,7 +195,6 @@ namespace EzrealHu3
                 {
                     if (minion == null) return;
                     Q.Cast(minion);
-                    Chat.Print("LastHit Q");
                 }
 
             }
@@ -237,21 +210,8 @@ namespace EzrealHu3
                 {
                     if (minion == null) return;
                     Q.Cast(minion);
-                    Chat.Print("LaneClear Q");
                 }
             }
-        }
-        private static void Items()
-        {
-            var healthP = SettingsMenu["helthP"].Cast<CheckBox>().CurrentValue;
-            var healthS = SettingsMenu["helthS"].Cast<Slider>().CurrentValue;
-            var healthPot = new Item((int)ItemId.Health_Potion);
-            if (_Player.HealthPercent > 99)
-            {
-                Chat.Print("Use Pot");
-                healthPot.Cast();
-            }
-
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

@@ -46,7 +46,7 @@ namespace TristanaHu3
             R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 1.8");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.9");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = TristanaMenu.AddSubMenu("Settings", "Settings");
@@ -65,22 +65,6 @@ namespace TristanaHu3
             SettingsMenu.Add("drawE", new CheckBox("Draw E"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
-            ActivatorMenu = TristanaMenu.AddSubMenu("Activator", "Activator");
-            ActivatorMenu.Add("useitems", new CheckBox("Use Activator"));
-            ActivatorMenu.AddGroupLabel("Potions Health");
-            ActivatorMenu.Add("healthP", new CheckBox("Health Potion", true));
-            ActivatorMenu.Add("healthS", new Slider("Min HP %", 20));
-            ActivatorMenu.AddGroupLabel("Potions Mana");
-            ActivatorMenu.Add("manaP", new CheckBox("Mana Potion", true));
-            ActivatorMenu.Add("manaS", new Slider("Min Mana %", 20));            
-            ActivatorMenu.AddGroupLabel("Items");
-            ActivatorMenu.Add("blade", new CheckBox("Blade Of Knight Ruined"));
-            ActivatorMenu.Add("bladeS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
-            ActivatorMenu.Add("youmu", new CheckBox("Youmuu's Ghostblade"));
-            ActivatorMenu.Add("youmuS", new Slider("▲ Enemie Helth % To Use ▲", 80, 1, 100));
-            ActivatorMenu.Add("changeT", new CheckBox("Change Trinket To Blue"));
-            ActivatorMenu.Add("changeS", new Slider("▲ Level To Change Trinket ▲", 6, 1, 18));
-            ActivatorMenu.Add("cleanser", new CheckBox("Use Cleanses Items On CC(WIP)"));
 
 
             Game.OnTick += Game_OnTick;
@@ -105,10 +89,6 @@ namespace TristanaHu3
             if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
             {
                 KillSteal();
-            }
-            if (ActivatorMenu["useitems"].Cast<CheckBox>().CurrentValue)
-            {
-                Items();
             }
         }
         //Damages      
@@ -207,56 +187,6 @@ namespace TristanaHu3
                 }
             }
         }
-        private static void Items()
-        {
-            
-            var useHealthP = ActivatorMenu["healthP"].Cast<CheckBox>().CurrentValue;
-            var healthS = ActivatorMenu["healthS"].Cast<Slider>().CurrentValue;
-            var useManaP = ActivatorMenu["manaP"].Cast<CheckBox>().CurrentValue;
-            var manaS = ActivatorMenu["manaS"].Cast<Slider>().CurrentValue;
-            var changeT = ActivatorMenu["changeT"].Cast<Slider>().CurrentValue;
-            var changeS = ActivatorMenu["changeS"].Cast<Slider>().CurrentValue;
-            var useBlade = ActivatorMenu["blade"].Cast<CheckBox>().CurrentValue;
-            var bladeS = ActivatorMenu["bladeS"].Cast<Slider>().CurrentValue;
-            var useYoumou = ActivatorMenu["youmou"].Cast<CheckBox>().CurrentValue;
-            var youmouS = ActivatorMenu["youmouS"].Cast<Slider>().CurrentValue;
-            var useCleanser = ActivatorMenu["cleanser"].Cast<CheckBox>().CurrentValue;
-            var blade1 = new Item((int)ItemId.Blade_of_the_Ruined_King);
-            var blade2 = new Item((int)ItemId.Bilgewater_Cutlass);
-            var youmu = new Item((int)ItemId.Youmuus_Ghostblade);
-            var healthP = new Item((int)ItemId.Health_Potion);
-            var manaP = new Item((int)ItemId.Health_Potion);
-            var trinketG = new Item((int)ItemId.Warding_Totem_Trinket);
-            var trinketB = new Item((int)ItemId.Scrying_Orb_Trinket);
-
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
-            {
-                if (target.HealthPercent <= bladeS && (blade1.IsOwned() || blade2.IsOwned()) && (blade1.IsReady() || blade2.IsReady()))
-                {
-                    blade1.Cast(target);
-                    blade2.Cast(target);
-                }
-                if (target.HealthPercent <= youmouS && youmu.IsOwned() && youmu.IsReady())
-                {
-                    youmu.Cast();
-                }
-            }
-                
-            if (useHealthP && Player.Instance.HealthPercent < healthS)
-            {
-                healthP.Cast();
-            }
-            if (useManaP && Player.Instance.ManaPercent < manaS)
-            {
-                manaP.Cast();
-            }
-            if (trinketG.IsOwned() && !trinketB.IsOwned() && Player.Instance.Level == changeS)
-            {
-                Shop.SellItem(ItemId.Warding_Totem_Trinket);
-                Shop.BuyItem(ItemId.Scrying_Orb_Trinket);
-            }
-        }
-
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)

@@ -20,6 +20,7 @@ namespace KatarinaHu3
         public static Spell.Targeted E;
         public static Spell.Active R;
         public static Menu KatarinaMenu, SettingsMenu;
+        public static bool inult = false;
 
 
         static void Main(string[] args)
@@ -117,7 +118,85 @@ namespace KatarinaHu3
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 35*8, 55*8, 75*8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 35 * 8, 55 * 8, 75 * 8 }[Program.R.Level] + 0.25 * _Player.FlatMagicDamageMod + 0.37 * _Player.FlatPhysicalDamageMod));
+        }
+        private static void Killsteal()
+        {
+            var useKS = SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue;
+            var useEW = SettingsMenu["killstealEW"].Cast<CheckBox>().CurrentValue;
+            var useEWQ = SettingsMenu["killstealEWQ"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
+            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            {
+                if (target == null) return;
+                if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
+                {
+                    E.Cast(target);
+                    W.Cast();
+                }
+                if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
+                {
+                    E.Cast(target);
+                    W.Cast();
+                    Q.Cast(target);
+                }
+                if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
+                {
+                    Q.Cast(target);
+                }
+            }
+        }
+        private static void Combo()
+        {
+            foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
+            {
+                var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
+                var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
+                var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
+                var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+                if (target == null || inult == true) return;
+                if (useQ && target.IsValidTarget(Q.Range))
+                {
+                    Q.Cast(target);
+                }
+                if (useE && target.IsValidTarget(Q.Range))
+                {
+                    E.Cast(target);
+                }
+                if (useW && target.IsValidTarget(Q.Range))
+                {
+                    W.Cast();
+                }
+                if (useR && target.IsValidTarget(Q.Range))
+                {
+                    R.Cast();
+                    inult = true;
+                }
+            }
+
+        }
+        private static void Harass()
+        {
+            foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
+            {
+                var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
+                var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
+                var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
+                if (target == null || inult == true) return;
+                if (useQ && target.IsValidTarget(Q.Range))
+                {
+                    Q.Cast(target);
+                }
+                if (useE && target.IsValidTarget(Q.Range))
+                {
+                    E.Cast(target);
+                }
+                if (useW && target.IsValidTarget(Q.Range))
+                {
+                    W.Cast();
+                }
+            }
+
         }
     }
 }

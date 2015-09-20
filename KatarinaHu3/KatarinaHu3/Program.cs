@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.2");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 1.3");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -87,19 +87,19 @@ namespace KatarinaHu3
             {
                 KillSteal();
             }
-            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
             }
-            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
             }
-            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
             {
                 LaneClear();
             }
-            else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
             {
                 LastHit();
             }
@@ -139,18 +139,18 @@ namespace KatarinaHu3
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
                 if (target == null) return;
-                else if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
+                if (useKS && useEW && target.Health < EDamage(target) + WDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                 }
-                else if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
+                if (useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
                 {
                     E.Cast(target);
                     W.Cast();
                     Q.Cast(target);
                 }
-                else if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
+                if (useKS && useQ && target.Health < QDamage(target) + WDamage(target))
                 {
                     Q.Cast(target);
                 }
@@ -158,6 +158,7 @@ namespace KatarinaHu3
         }
         private static void Combo()
         {
+            Chat.Print("Combo");
             foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
             {
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
@@ -165,19 +166,19 @@ namespace KatarinaHu3
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
-                else if (useQ && target.IsValidTarget(Q.Range))
+                if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                else if (useE && target.IsValidTarget(W.Range))
+                if (useE && target.IsValidTarget(W.Range))
                 {
                     E.Cast(target);
                 }
-                else if (useW && target.IsValidTarget(W.Range))
+                if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
                 }
-                else if (useR && target.IsValidTarget(R.Range) 
+                if (useR && target.IsValidTarget(R.Range) 
                     && !Q.IsReady()
                     && !W.IsReady()
                     && !E.IsReady()
@@ -191,21 +192,22 @@ namespace KatarinaHu3
         }
         private static void Harass()
         {
+            Chat.Print("Harass");
             foreach (var target in HeroManager.Enemies.Where(o => !o.IsDead))
             {
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
-                else if (useQ && target.IsValidTarget(Q.Range))
+                if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                else if (useE && target.IsValidTarget(E.Range))
+                if (useE && target.IsValidTarget(E.Range))
                 {
                     E.Cast(target);
                 }
-                else if (useW && target.IsValidTarget(W.Range))
+                if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
                 }
@@ -214,6 +216,7 @@ namespace KatarinaHu3
         }
         private static void CheckUlt()
         {
+            Chat.Print("Check Ult");
             if (_Player.IsDead) return;
             if (!_Player.HasBuff("katarinarsound"))
             {
@@ -230,6 +233,7 @@ namespace KatarinaHu3
         }
         private static void LastHit()
         {
+            Chat.Print("LastHit");
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {                
                 var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
@@ -258,7 +262,7 @@ namespace KatarinaHu3
         }
         private static void LaneClear()
         {
-
+            Chat.Print("Lane Clear");
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {                
                 var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;

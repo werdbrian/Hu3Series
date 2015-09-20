@@ -60,8 +60,7 @@ namespace KatarinaHu3
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("LaneHit", new CheckBox("Use Smart LastHitting"));
             SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("LaneClearQ", new CheckBox("Use Q LaneClear"));
-            SettingsMenu.Add("LaneClearW", new CheckBox("Use W LaneClear"));
+            SettingsMenu.Add("LaneClear", new CheckBox("Use Smart LaneClearing"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
@@ -235,40 +234,53 @@ namespace KatarinaHu3
                 var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");             
                 if (minion == null) return;
-                if (LH && Q.IsReady() && W.IsReady())
+                if (LH && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                    && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
-                    
-                    E.Cast(minion);
+                    Q.Cast(minion);
+                    if (hasBuff)
+                    {
+                        W.Cast();
+                    }                
+                }
+                if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                    && minion.Health < QDamage(minion))
+                    {
+                        Q.Cast(minion);
+                    }
+                if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
+                    && minion.Health < WDamage(minion))
+                {
+                    W.Cast();
                 }
             }
         }
         private static void LaneClear()
         {
-            
+
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
             {
-                var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
-                var useE = SettingsMenu["laneclearW"].Cast<CheckBox>().CurrentValue;
-                if (useE && E.IsReady())
+                var LC = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
+                var hasBuff = minion.HasBuff("katarinaqmark");
+                if (minion == null) return;
+                if (LC && Q.IsReady() && W.IsReady() && minion.IsValidTarget(W.Range)
+                    && minion.Health < QDamage(minion) + Q2Damage(minion) + WDamage(minion))
                 {
-                    if (minion == null) return;
-                    E.Cast(minion);
-                }
-                if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
-                {
-                    if (minion == null) return;
-                    Q.Cast();
-                }
-                foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
-                {
-                    if (!tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
+                    Q.Cast(minion);
+                    if (hasBuff)
                     {
-                        E.Cast(tower);
+                        W.Cast();
                     }
-                    if (tower.HasBuff("tristanaecharge"))
-                    {
-                        Q.Cast();
-                    }
+                }
+                if (LC && Q.IsReady() && minion.IsValidTarget(Q.Range)
+                    && minion.Health < QDamage(minion))
+                {
+                    Q.Cast(minion);
+                }
+                if (LC && W.IsReady() && minion.IsValidTarget(W.Range)
+                    && minion.Health < WDamage(minion))
+                {
+                    W.Cast();
                 }
             }
         }

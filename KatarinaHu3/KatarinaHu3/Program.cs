@@ -40,7 +40,6 @@ namespace KatarinaHu3
 
             TargetSelector.Init();
             Bootstrap.Init(null);
-            uint level = (uint)Player.Instance.Level;
             Q = new Spell.Targeted(SpellSlot.Q, 675);
             W = new Spell.Active(SpellSlot.W, 370);
             E = new Spell.Targeted(SpellSlot.E, 700);
@@ -166,15 +165,15 @@ namespace KatarinaHu3
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
                 if (target == null || inult == true) return;
-                else if (useQ && target.IsValidTarget(Q.Range) && inult == false)
+                else if (useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                else if (useE && target.IsValidTarget(W.Range) && inult == false)
+                else if (useE && target.IsValidTarget(W.Range))
                 {
                     E.Cast(target);
                 }
-                else if (useW && target.IsValidTarget(W.Range) && inult == false)
+                else if (useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
                 }
@@ -216,7 +215,7 @@ namespace KatarinaHu3
         private static void CheckUlt()
         {
             if (_Player.IsDead) return;
-            else if (!_Player.HasBuff("katarinarsound"))
+            if (!_Player.HasBuff("katarinarsound"))
             {
                 Orbwalker.DisableAttacking = false;
                 Orbwalker.DisableMovement = false;

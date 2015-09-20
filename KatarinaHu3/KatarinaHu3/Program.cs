@@ -45,7 +45,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.7");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.8");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -168,19 +168,19 @@ namespace KatarinaHu3
                 var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
-                if (useQ && target.IsValidTarget(Q.Range))
+                if (Q.IsReady() && useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                if (useE && target.IsValidTarget(W.Range))
+                if (E.IsReady() && useE && target.IsValidTarget(W.Range))
                 {
                     E.Cast(target);
                 }
-                if (useW && target.IsValidTarget(W.Range))
+                if (W.IsReady() && useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
                 }
-                if (useR && target.IsValidTarget(R.Range)
+                if (R.IsReady() && useR && target.IsValidTarget(R.Range)
                     && !Q.IsReady()
                     && !W.IsReady()
                     && !E.IsReady())
@@ -198,11 +198,11 @@ namespace KatarinaHu3
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
                 if (target == null) return;
-                if (useQ && target.IsValidTarget(Q.Range))
+                if (Q.IsReady() && useQ && target.IsValidTarget(Q.Range))
                 {
                     Q.Cast(target);
                 }
-                if (useW && target.IsValidTarget(W.Range))
+                if (W.IsReady() && useW && target.IsValidTarget(W.Range))
                 {
                     W.Cast();
                 }
@@ -234,7 +234,6 @@ namespace KatarinaHu3
             var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < qRange()).OrderBy(a => a.Health).FirstOrDefault();
             var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
                 var hasBuff = minion.HasBuff("katarinaqmark");
-                if (minion == null) return;
                 if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
                     && minion.Health < QDamage(minion))
                     {
@@ -251,7 +250,6 @@ namespace KatarinaHu3
             var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < qRange()).OrderBy(a => a.Health).FirstOrDefault();
             var LH = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
             var hasBuff = minion.HasBuff("katarinaqmark");
-            if (minion == null) return;
             if (LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
                 && minion.Health < QDamage(minion))
             {

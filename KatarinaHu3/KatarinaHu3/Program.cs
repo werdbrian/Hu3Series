@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version 0.2");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version 0.3");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -163,29 +163,34 @@ namespace KatarinaHu3
         }
         private static void Combo()
         {
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            if(useQ && Q.IsReady() && ulting == false)
             {
-                var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
-                var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
-                var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-                var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
-                if (Q.IsReady() && useQ && target.IsValidTarget(Q.Range) && ulting == false)
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead))
                 {
                     Q.Cast(target);
                 }
-                if (E.IsReady() && useE && target.IsValidTarget(E.Range) && ulting == false)
+            }
+            if (useE && E.IsReady() && ulting == false)
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
                 {
                     E.Cast(target);
                 }
-                if (W.IsReady() && useW && target.IsValidTarget(W.Range) && ulting == false)
+            }
+            if (useW && W.IsReady() && ulting == false)
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead))
                 {
                     W.Cast();
                 }
-                if (R.IsReady() && useR && target.IsValidTarget(R.Range)
-                    && !Q.IsReady()
-                    && !W.IsReady()
-                    && !E.IsReady()
-                    && ulting == false)
+            }
+            if (useR && !Q.IsReady() && !W.IsReady() && !E.IsReady() && ulting == false)
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead))
                 {
                     Orbwalker.DisableAttacking = true;
                     Orbwalker.DisableMovement = true;
@@ -216,7 +221,7 @@ namespace KatarinaHu3
         }
         private static void CheckUlt()
         {
-            if (!_Player.HasBuff("katarinarsound"))
+            if (!_Player.HasBuff("katarinarsound") && ulting == true)
             {
                 Orbwalker.DisableAttacking = false;
                 Orbwalker.DisableMovement = false;
@@ -237,7 +242,7 @@ namespace KatarinaHu3
             }
             if (useW && W.IsReady())
             {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= WDamage(m)))
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(W.Range) && m.Health <= WDamage(m)))
                 {
                     W.Cast();
                 }
@@ -250,14 +255,14 @@ namespace KatarinaHu3
 
             if (useQ && Q.IsReady())
             {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= QDamage(m)))
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range)))
                 {
                     Q.Cast(minion);
                 }
             }
             if (useW && W.IsReady())
             {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= WDamage(m)))
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(W.Range)))
                 {
                     W.Cast();
                 }

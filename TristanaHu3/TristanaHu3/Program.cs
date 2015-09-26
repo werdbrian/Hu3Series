@@ -102,11 +102,19 @@ namespace TristanaHu3
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 80, 105, 130, 155, 180 }[Program.W.Level] + 0.5 * _Player.FlatMagicDamageMod));
         }
+
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
                 (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1.0 * _Player.FlatMagicDamageMod));
         }
+
+        public static float EDamage(Obj_AI_Base target)
+        {
+            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
+                (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1.0 * _Player.FlatMagicDamageMod));
+        }
+
         private static void KillSteal()
         {
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;

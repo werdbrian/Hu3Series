@@ -20,6 +20,7 @@ namespace KatarinaHu3
         public static Spell.Targeted E;
         public static Spell.Active R;
         public static Menu KatarinaMenu, SettingsMenu;
+        public static bool ulting = false;
 
 
         static void Main(string[] args)
@@ -45,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 0.9");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -56,14 +57,17 @@ namespace KatarinaHu3
             SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("LastHit");
-            SettingsMenu.Add("LaneHit", new CheckBox("Use Smart LastHitting"));
+            SettingsMenu.Add("qLasthit", new CheckBox("Use Q on Last Hit"));
+            SettingsMenu.Add("wLasthit", new CheckBox("Use W on Last Hit"));
+            SettingsMenu.Add("sLasthit", new CheckBox("Use Smart LastHitting ?"));
             SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("LaneClear", new CheckBox("Use Smart LaneClearing"));
+            SettingsMenu.Add("qLaneclear", new CheckBox("Use Q on Last Hit"));
+            SettingsMenu.Add("wLaneclear", new CheckBox("Use W on Last Hit"));
+            SettingsMenu.Add("sLaneclear", new CheckBox("Use Smart LaneClearing ?"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealEW", new CheckBox("Use E->W KillSteal"));
             SettingsMenu.Add("killstealEWQ", new CheckBox("Use E->W->Q KillSteal"));
             SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
@@ -130,30 +134,34 @@ namespace KatarinaHu3
         }
         private static void KillSteal()
         {
-            var useKS = SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue;
             var useEW = SettingsMenu["killstealEW"].Cast<CheckBox>().CurrentValue;
             var useEWQ = SettingsMenu["killstealEWQ"].Cast<CheckBox>().CurrentValue;
             var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            if (useEW && E.IsReady() && W.IsReady())
             {
-                if (target == null) return;
-                if (W.IsReady() && E.IsReady() && useKS && useEW && target.Health < EDamage(target) + WDamage(target))
+                foreach (var target in HeroManager.Enemies.Where(e => e.IsValidTarget(E.Range) && !e.IsDead
+                && e.Health < EDamage(e) + WDamage(e)))
                 {
                     E.Cast(target);
                     W.Cast();
-                    Chat.Print("KS EW");
                 }
-                if (Q.IsReady() && W.IsReady() && E.IsReady() && useKS && useEWQ && target.Health < EDamage(target) + WDamage(target) + QDamage(target))
+            }
+            if (useEWQ && Q.IsReady() && W.IsReady() && E.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(e => e.IsValidTarget(E.Range) && !e.IsDead
+                && e.Health < EDamage(e) + WDamage(e) + QDamage(e)))
                 {
                     E.Cast(target);
                     W.Cast();
                     Q.Cast(target);
-                    Chat.Print("KS EWQ");
                 }
-                if (Q.IsReady() && useKS && useQ && target.Health < QDamage(target) + WDamage(target))
+            }
+            if (useQ && Q.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(e => e.IsValidTarget(E.Range) && !e.IsDead
+                && e.Health < QDamage(e)))
                 {
                     Q.Cast(target);
-                    Chat.Print("KS Q");
                 }
             }
         }
@@ -161,51 +169,54 @@ namespace KatarinaHu3
         {
             foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
             {
-                if (target == null) return;
                 var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
                 var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
                 var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
-                if (Q.IsReady() && useQ && target.IsValidTarget(Q.Range))
+                if (Q.IsReady() && useQ && target.IsValidTarget(Q.Range) && ulting == false)
                 {
                     Q.Cast(target);
                 }
-                if (E.IsReady() && useE && target.IsValidTarget(E.Range))
+                if (E.IsReady() && useE && target.IsValidTarget(E.Range) && ulting == false)
                 {
                     E.Cast(target);
                 }
-                if (W.IsReady() && useW && target.IsValidTarget(W.Range))
+                if (W.IsReady() && useW && target.IsValidTarget(W.Range) && ulting == false)
                 {
                     W.Cast();
                 }
                 if (R.IsReady() && useR && target.IsValidTarget(R.Range)
                     && !Q.IsReady()
                     && !W.IsReady()
-                    && !E.IsReady())
+                    && !E.IsReady()
+                    && ulting == false)
                 {
                     Orbwalker.DisableAttacking = true;
                     Orbwalker.DisableMovement = true;
-
+                    ulting = true;
                     R.Cast();
                 }
             }
         }
         private static void Harass()
         {
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
-            {
                 var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
                 var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-                if (target == null) return;
-                if (Q.IsReady() && useQ && target.IsValidTarget(Q.Range))
+                if (useQ && Q.IsReady())
                 {
-                    Q.Cast(target);
+                    foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+                    {
+                       Q.Cast(target);
+                    }
                 }
-                if (W.IsReady() && useW && target.IsValidTarget(W.Range))
+
+                if (useW && W.IsReady())
                 {
-                    W.Cast();
+                    foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
+                    {
+                       W.Cast();
+                    }
                 }
-            }
         }
         private static void CheckUlt()
         {
@@ -213,47 +224,79 @@ namespace KatarinaHu3
             {
                 Orbwalker.DisableAttacking = false;
                 Orbwalker.DisableMovement = false;
+                ulting = false;
             }
-        }
-        public static float qRange()
-        {
-            if (Q.IsReady())
-            {
-                return Q.Range;
-            }
-            return _Player.GetAutoAttackRange();
         }
         private static void LastHit()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < qRange()).OrderBy(a => a.Health).FirstOrDefault();
-            var LH = SettingsMenu["LastHit"].Cast<CheckBox>().CurrentValue;
-                var hasBuff = minion.HasBuff("katarinaqmark");
-                if(LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
-                    && minion.Health < QDamage(minion))
-                    {
-                        Q.Cast(minion);
+            var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["lasthitW"].Cast<CheckBox>().CurrentValue;
+            var useS = SettingsMenu["sLasthit"].Cast<CheckBox>().CurrentValue;
+
+            if (useQ && Q.IsReady())
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= QDamage(m)))
+                {
+                  Q.Cast(minion);
                 }
-                if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
-                    && minion.Health < WDamage(minion))
+            }
+            if (useW && W.IsReady())
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= WDamage(m)))
                 {
                     W.Cast();
                 }
             }
+            if (useS && useQ && Q.IsReady() && useW && W.IsReady())
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(W.Range) && m.Health 
+                <= WDamage(m)
+                + QDamage(m) 
+                + Q2Damage(m)))
+                {
+                    Q.Cast(minion);
+                    if (minion.HasBuff("katarinaqmark"))
+                    {
+                        W.Cast();
+                    }
+                }
+            }
+        }
         private static void LaneClear()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && a.Distance(_Player) < qRange()).OrderBy(a => a.Health).FirstOrDefault();
-            var LH = SettingsMenu["LaneClear"].Cast<CheckBox>().CurrentValue;
-            var hasBuff = minion.HasBuff("katarinaqmark");
-            if (LH && Q.IsReady() && minion.IsValidTarget(Q.Range)
-                && minion.Health < QDamage(minion))
+            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["laneclearW"].Cast<CheckBox>().CurrentValue;
+            var useS = SettingsMenu["sLaneclear"].Cast<CheckBox>().CurrentValue;
+
+            if (useQ && Q.IsReady())
             {
-                Q.Cast(minion);
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= QDamage(m)))
+                {
+                    Q.Cast(minion);
+                }
             }
-            if (LH && W.IsReady() && minion.IsValidTarget(W.Range)
-                && minion.Health < WDamage(minion))
+            if (useW && W.IsReady())
             {
-                W.Cast();
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range) && m.Health <= WDamage(m)))
+                {
+                    W.Cast();
+                }
             }
+            if (useS && useQ && Q.IsReady() && useW && W.IsReady())
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(W.Range) && m.Health
+                <= WDamage(m)
+                + QDamage(m)
+                + Q2Damage(m)))
+                {
+                    Q.Cast(minion);
+                    if (minion.HasBuff("katarinaqmark"))
+                    {
+                        W.Cast();
+                    }
+                }
+            }
+
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

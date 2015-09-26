@@ -76,10 +76,10 @@ namespace ThreshHu3
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
-            Gapcloser.OnGapCloser += Gapcloser_OnGapCloser;
+            Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
 
         }
-        private static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapCloserEventArgs e)
+        private static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (!e.Sender.IsValidTarget() || !SettingsMenu["gapE"].Cast<CheckBox>().CurrentValue)
             {

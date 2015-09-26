@@ -40,13 +40,13 @@ namespace TristanaHu3
             TargetSelector.Init();
             Bootstrap.Init(null);
             uint level = (uint)Player.Instance.Level;
-            Q = new Spell.Active(SpellSlot.Q);
+            Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
             W = new Spell.Skillshot(SpellSlot.W, 880, SkillShotType.Circular, (int)0.50f, Int32.MaxValue, (int)250f);
             E = new Spell.Targeted(SpellSlot.E, 543 + level * 7);
             R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 1.9");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 2.1");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = TristanaMenu.AddSubMenu("Settings", "Settings");
@@ -57,6 +57,11 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
+            SettingsMenu.AddLabel("LaneClear");
+            SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
+            SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
+            SettingsMenu.Add("laneclearQtower", new CheckBox("Use Q on Towers"));
+            SettingsMenu.Add("laneclearEtower", new CheckBox("Use E on Towers"));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
@@ -126,13 +131,16 @@ namespace TristanaHu3
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            if (useE && E.IsReady())
             {
-                if (useE && E.IsReady() && target.IsValidTarget(E.Range))
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    E.Cast(target);
+                        E.Cast(target);
                 }
-                if (useQ && Q.IsReady())
+            }
+            if (useQ && Q.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
                     Q.Cast();
                 }
@@ -141,18 +149,23 @@ namespace TristanaHu3
 
         private static void Harass()
         {
-            var hasBuffTristE = Player.Instance.HasBuff("tristanaecharge");
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
+            if (useE && E.IsReady())
             {
-                if (useE && E.IsReady() && E.Cast(target))
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
                 {
                     E.Cast(target);
                 }
-                if (useQ && Q.IsReady() && hasBuffTristE)
+            }
+            if (useQ && Q.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    Q.Cast();
+                    if (target.HasBuff("tristanecharge"))
+                    {
+                        Q.Cast();
+                    }                  
                 }
             }
 
@@ -161,31 +174,42 @@ namespace TristanaHu3
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
-            foreach(var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
+            var useQtower = SettingsMenu["laneclearQtower"].Cast<CheckBox>().CurrentValue;
+            var useEtower = SettingsMenu["laneclearEtower"].Cast<CheckBox>().CurrentValue;
+            
+            if (useE && E.IsReady())
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(E.Range)))
                 {
-
-                if (useE && E.IsReady())
-                {
-                    if (minion == null) return;
                     E.Cast(minion);
                 }
-                if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
+            }
+
+            if (useQ && Q.IsReady())
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(Q.Range)))
                 {
-                    if (minion == null) return;
-                    Q.Cast();
+                    if(minion.HasBuff("tristanaecharge"))
+                    {
+                        Q.Cast();
+                    }
                 }
+            }
+            if (useEtower && E.IsReady())
+            {
                 foreach (Obj_AI_Turret tower in ObjectManager.Get<Obj_AI_Turret>())
                 {
                     if (!tower.IsDead && tower.Health > 200 && tower.IsEnemy && tower.IsValidTarget())
                     {
                         E.Cast(tower);
                     }
-                    if (tower.HasBuff("tristanaecharge"))
+                    if (useQtower && tower.HasBuff("tristanaecharge"))
                     {
                         Q.Cast();
                     }
                 }
             }
+
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

@@ -45,7 +45,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 2.0");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.2");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -105,17 +105,17 @@ namespace EzrealHu3
         public static float QDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 35, 55, 75, 95, 115 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 30, 50, 70, 90, 110 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
         }
         public static float WDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 70, 115, 160, 205, 250 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 65, 110, 155, 200, 245 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
         }
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 320, 470, 600 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
+                (float)(new[] { 315, 465, 595 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
         }
         private static void KillSteal()
         {
@@ -123,19 +123,34 @@ namespace EzrealHu3
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
 
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
+            if (useQ && Q.IsReady())
             {
-                if (Q.IsReady() && useQ && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range))
+                foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
                 {
-                    Q.Cast(target);
+                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                    {
+                        Q.Cast(target);
+                    }
                 }
-                if (W.IsReady() && useW && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
+            }
+            if (useW && W.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
                 {
-                    W.Cast(target);
+                    if (W.GetPrediction(target).HitChance >= HitChance.High)
+                    {
+                        W.Cast(target);
+                    }
                 }
-                if (R.IsReady() && useR && R.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(2000))
+            }
+            if (useR && R.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(R.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
                 {
-                    R.Cast(target);
+                    if (R.GetPrediction(target).HitChance >= HitChance.High)
+                    {
+                        R.Cast(target);
+                    }
                 }
             }
         }
@@ -146,22 +161,35 @@ namespace EzrealHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
 
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            if (useQ && Q.IsReady())
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    Q.Cast(target);
-                    Chat.Print("Q");
+                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                    {
+                        Q.Cast(target);
+                    }
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.Medium && target.IsValidTarget(W.Range))
+            }
+            if (useW && W.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    W.Cast(target);
-                    Chat.Print("W");
+                    if (W.GetPrediction(target).HitChance >= HitChance.Medium)
+                    {
+                        W.Cast(target);
+                    }
                 }
-                if (useR && R.IsReady() && R.GetPrediction(target).HitChance >= HitChance.High && target.Health <= RDamage(target) && target.IsValidTarget(R.Range))
+            }
+
+            if (useR && R.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    R.Cast(target);
-                    Chat.Print("R");
+                    if (R.GetPrediction(target).HitChance >= HitChance.High && target.Health < RDamage(target))
+                    {
+                        R.Cast(target);
+                    }
                 }
             }
         }
@@ -171,16 +199,25 @@ namespace EzrealHu3
 
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            if (useQ && Q.IsReady())
             {
-                if (target == null) return;
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    Q.Cast(target);
+                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
+                    {
+                        Q.Cast(target);
+                    }
                 }
-                if (useW && W.IsReady() && W.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(W.Range))
+            }
+
+            if (useW && W.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    W.Cast(target);
+                    if (W.GetPrediction(target).HitChance >= HitChance.Medium)
+                    {
+                        W.Cast(target);
+                    }
                 }
             }
         }
@@ -189,27 +226,31 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsValidTarget(550)))
-            {
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
+            if(useQ && Q.IsReady())
                 {
-                    if (minion == null) return;
-                    Q.Cast(minion);
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsInAutoAttackRange(a) && a.IsValidTarget(Q.Range)))
+                {
+                    if (Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
+                    {
+                        Q.Cast(minion);
+                    }
                 }
-
             }
+            
         }
         private static void LaneClear()
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-
-            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy))
+            if (useQ && Q.IsReady())
             {
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsInAutoAttackRange(a) && a.IsValidTarget(Q.Range)))
                 {
-                    if (minion == null) return;
-                    Q.Cast(minion);
+                    if (Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
+                    {
+                        Q.Cast(minion);
+                    }
+
                 }
             }
         }

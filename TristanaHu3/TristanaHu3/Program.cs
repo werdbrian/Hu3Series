@@ -46,7 +46,7 @@ namespace TristanaHu3
             R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             TristanaMenu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            TristanaMenu.AddGroupLabel("Tristana Hu3 2.1");
+            TristanaMenu.AddGroupLabel("Tristana Hu3 1.3");
             TristanaMenu.AddSeparator();
             TristanaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = TristanaMenu.AddSubMenu("Settings", "Settings");

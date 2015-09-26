@@ -37,7 +37,7 @@ namespace MundoHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Mundo")
+            if (Player.Instance.ChampionName != "DrMundo")
                 return;
 
             TargetSelector.Init();

@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version 0.2");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -59,11 +59,9 @@ namespace KatarinaHu3
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("qLasthit", new CheckBox("Use Q on Last Hit"));
             SettingsMenu.Add("wLasthit", new CheckBox("Use W on Last Hit"));
-            SettingsMenu.Add("sLasthit", new CheckBox("Use Smart LastHitting ?"));
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("qLaneclear", new CheckBox("Use Q on Last Hit"));
             SettingsMenu.Add("wLaneclear", new CheckBox("Use W on Last Hit"));
-            SettingsMenu.Add("sLaneclear", new CheckBox("Use Smart LaneClearing ?"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
@@ -229,7 +227,6 @@ namespace KatarinaHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["lasthitW"].Cast<CheckBox>().CurrentValue;
-            var useS = SettingsMenu["sLasthit"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {
@@ -245,26 +242,11 @@ namespace KatarinaHu3
                     W.Cast();
                 }
             }
-            if (useS && useQ && Q.IsReady() && useW && W.IsReady())
-            {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(W.Range) && m.Health 
-                <= WDamage(m)
-                + QDamage(m) 
-                + Q2Damage(m)))
-                {
-                    Q.Cast(minion);
-                    if (minion.HasBuff("katarinaqmark"))
-                    {
-                        W.Cast();
-                    }
-                }
-            }
         }
         private static void LaneClear()
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["laneclearW"].Cast<CheckBox>().CurrentValue;
-            var useS = SettingsMenu["sLaneclear"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {
@@ -280,21 +262,6 @@ namespace KatarinaHu3
                     W.Cast();
                 }
             }
-            if (useS && useQ && Q.IsReady() && useW && W.IsReady())
-            {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && m.IsValidTarget(W.Range) && m.Health
-                <= WDamage(m)
-                + QDamage(m)
-                + Q2Damage(m)))
-                {
-                    Q.Cast(minion);
-                    if (minion.HasBuff("katarinaqmark"))
-                    {
-                        W.Cast();
-                    }
-                }
-            }
-
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

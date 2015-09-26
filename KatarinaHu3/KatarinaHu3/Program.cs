@@ -68,9 +68,9 @@ namespace KatarinaHu3
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killstealEW", new CheckBox("Use E->W KillSteal"));
-            SettingsMenu.Add("killstealEWQ", new CheckBox("Use E->W->Q KillSteal"));
-            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.Add("ksEW", new CheckBox("Use E->W KillSteal"));
+            SettingsMenu.Add("ksEWQ", new CheckBox("Use E->W->Q KillSteal"));
+            SettingsMenu.Add("ksQ", new CheckBox("Use Q KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
@@ -85,10 +85,8 @@ namespace KatarinaHu3
         {
             CheckUlt();
 
-            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
-            {
-                KillSteal();
-            }
+            KillSteal();
+
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();

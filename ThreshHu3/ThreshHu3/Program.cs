@@ -50,7 +50,7 @@ namespace ThreshHu3
             R = new Spell.Active(SpellSlot.R, 350);
 
             ThreshMenu = MainMenu.AddMenu("Thresh Hu3", "threshhu3");
-            ThreshMenu.AddGroupLabel("Thresh Hu3 1.0");
+            ThreshMenu.AddGroupLabel("Thresh Hu3 0.2");
             ThreshMenu.AddSeparator();
             ThreshMenu.AddLabel("Made By MarioGK");
             SettingsMenu = ThreshMenu.AddSubMenu("Settings", "Settings");
@@ -58,7 +58,7 @@ namespace ThreshHu3
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("comboQ2", new CheckBox("Follow with Q on Combo"));
-            SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
+            SettingsMenu.Add("comboW", new CheckBox("Use W on Combo, Not Working(WIP)"));
             SettingsMenu.Add("comboR", new CheckBox("Use R on Combo"));
             SettingsMenu.Add("comboRmin", new Slider("Min Enemies to use R", 2, 1, 5));
             SettingsMenu.AddLabel("Harass");
@@ -110,32 +110,56 @@ namespace ThreshHu3
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
             var minR = SettingsMenu["comboRmin"].Cast<Slider>().CurrentValue;
 
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+            if (useQ && Q.IsReady())
             {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    Q.Cast(target);
+                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                    {
+                        Q.Cast(target);
+                    }
                 }
-                if (useQ2 && Q2.IsReady() && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range))
-                {
-                    Q2.Cast();
-                }
-                if (useE && E.IsReady() && target.IsValidTarget(E.Range) && E.GetPrediction(target).HitChance >= HitChance.Medium)
-                {
-                    var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
-                    var predictionE = E.GetPrediction(target);
-                    var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
-                    var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
-                    var v3 = new Vector3(
-                        Player.Instance.ServerPosition.X + x,
-                        Player.Instance.ServerPosition.Y + y,
-                        Player.Instance.ServerPosition.Z);
+            }
 
-                    E.Cast(getOutRange ? predictionE.CastPosition : v3);
-                }
-                if (useR && R.IsReady() && Player.Instance.CountEnemiesInRange(R.Range) >= minR)
+            if (useQ2)
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q2.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    R.Cast();
+                    if (useQ2 && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range))
+                    {
+                        Q2.Cast();
+                    }
+                }
+            }
+
+            if (useE && E.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (E.GetPrediction(target).HitChance >= HitChance.Medium)
+                    {
+                        var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+                        var predictionE = E.GetPrediction(target);
+                        var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
+                        var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
+                        var v3 = new Vector3(
+                            Player.Instance.ServerPosition.X + x,
+                            Player.Instance.ServerPosition.Y + y,
+                            Player.Instance.ServerPosition.Z);
+
+                        E.Cast(getOutRange ? predictionE.CastPosition : v3);
+                    }
+                }
+            }
+
+            if (useR && R.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (Player.Instance.CountEnemiesInRange(R.Range) >= minR)
+                    {
+                        R.Cast();
+                    }
                 }
             }
         }
@@ -146,28 +170,46 @@ namespace ThreshHu3
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useQ2 = SettingsMenu["harassQ2"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-            {
-                if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High)
-                {
-                    Q.Cast(target);
-                }
-                if (useQ2 && Q2.IsReady() && target.HasBuff("ThreshQ"))
-                {
-                    Q2.Cast();
-                }
-                if (useE && E.IsReady() && target.IsValidTarget(E.Range) && E.GetPrediction(target).HitChance >= HitChance.Medium)
-                {
-                    var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
-                    var predictionE = E.GetPrediction(target);
-                    var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
-                    var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
-                    var v3 = new Vector3(
-                        Player.Instance.ServerPosition.X + x,
-                        Player.Instance.ServerPosition.Y + y,
-                        Player.Instance.ServerPosition.Z);
 
-                    E.Cast(getOutRange ? predictionE.CastPosition : v3);
+            if (useQ && Q.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
+                    {
+                        Q.Cast(target);
+                    }
+                }
+            }
+
+            if (useQ2)
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q2.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (useQ2 && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range))
+                    {
+                        Q2.Cast();
+                    }
+                }
+            }
+
+            if (useE && E.IsReady())
+            {
+                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
+                {
+                    if (E.GetPrediction(target).HitChance >= HitChance.Medium)
+                    {
+                        var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+                        var predictionE = E.GetPrediction(target);
+                        var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
+                        var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
+                        var v3 = new Vector3(
+                            Player.Instance.ServerPosition.X + x,
+                            Player.Instance.ServerPosition.Y + y,
+                            Player.Instance.ServerPosition.Z);
+
+                        E.Cast(getOutRange ? predictionE.CastPosition : v3);
+                    }
                 }
             }
         }

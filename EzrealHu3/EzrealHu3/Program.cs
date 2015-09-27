@@ -201,14 +201,11 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            var minion = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsEnemy && !m.IsDead && m.IsMinion);
-            foreach (var Minion in minion)
-            {
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && Minion.Health <= GetDamage(SpellSlot.Q, Minion))
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
-                    Q.Cast(Minion);
+                    Q.Cast(minion);
                 }
-            }
         }
         private static void LaneClear()
         {

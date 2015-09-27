@@ -30,7 +30,7 @@ namespace XerathHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Ezreal")
+            if (Player.Instance.ChampionName != "Xerath")
                 return;
 
             Q = new Spell.Chargeable(SpellSlot.Q, 750, 1500, int.MaxValue, 250, int.MaxValue, 100); 

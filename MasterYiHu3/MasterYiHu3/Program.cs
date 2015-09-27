@@ -44,7 +44,7 @@ namespace MasterYiHu3
             R = new Spell.Active(SpellSlot.R);
 
             Menu = MainMenu.AddMenu("MasterYiHu3", "masteryihu3");
-            Menu.AddGroupLabel("MasterYi Hu3 Test Version 0.1");
+            Menu.AddGroupLabel("MasterYi Hu3 Test Version 0.2");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
@@ -99,11 +99,17 @@ namespace MasterYiHu3
 
         private static void KillSteal()
         {
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            var useQ = SettingsMenu["Qkill"].Cast<CheckBox>().CurrentValue;
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && target.Health <= GetDamage(SpellSlot.Q, target))
+            {
+                Q.Cast(target);
+            }
         }
 
         private static void Combo()
         {
-            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["Rc"].Cast<CheckBox>().CurrentValue;
@@ -124,7 +130,7 @@ namespace MasterYiHu3
 
         private static void Harass()
         {
-            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
             {

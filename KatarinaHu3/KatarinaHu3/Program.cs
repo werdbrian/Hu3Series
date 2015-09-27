@@ -46,7 +46,7 @@ namespace KatarinaHu3
             R = new Spell.Active(SpellSlot.R, 540);
 
             KatarinaMenu = MainMenu.AddMenu("KatarinaHu3", "katarinahu3");
-            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version 0.3");
+            KatarinaMenu.AddGroupLabel("Katarina Hu3 Test Version 0.4");
             KatarinaMenu.AddSeparator();
             KatarinaMenu.AddLabel("Made By MarioGK");
             SettingsMenu = KatarinaMenu.AddSubMenu("Settings", "Settings");
@@ -81,8 +81,6 @@ namespace KatarinaHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
-            CheckUlt();
-
             KillSteal();
 
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
@@ -101,6 +99,8 @@ namespace KatarinaHu3
             {
                 LastHit();
             }
+
+            CheckUlt();
         }
         //Damages      
         public static float QDamage(Obj_AI_Base target)
@@ -167,6 +167,7 @@ namespace KatarinaHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+
             if(useQ && Q.IsReady() && ulting == false)
             {
                 foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead))
@@ -201,37 +202,42 @@ namespace KatarinaHu3
         }
         private static void Harass()
         {
-                var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
-                var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-                if (useQ && Q.IsReady())
-                {
-                    foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                    {
-                       Q.Cast(target);
-                    }
-                }
+            var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(Q.Range, EloBuddy.DamageType.Magical);
 
-                if (useW && W.IsReady())
+            if (target.IsValidTarget())
+            {
+                if (useQ && Q.IsReady() && Q.IsInRange(target))
                 {
-                    foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
-                    {
-                       W.Cast();
-                    }
+                    Q.Cast(target);
                 }
+                if (useW && W.IsInRange(target) && W.IsReady())
+                {
+                    W.Cast();
+                }
+            }
         }
         private static void CheckUlt()
         {
-            if (!_Player.HasBuff("katarinarsound") && ulting == true)
+            if (_Player.HasBuff("KatarinaR") || Player.Instance.Spellbook.IsChanneling || _Player.HasBuff("katarinarsound"))
             {
-                Orbwalker.DisableAttacking = false;
-                Orbwalker.DisableMovement = false;
+                Orbwalker.DisableAttacking = true;
+                Orbwalker.DisableMovement = true;
+                ulting = true;
+            }
+            else
+            {
+                Orbwalker.DisableAttacking = true;
+                Orbwalker.DisableMovement = true;
                 ulting = false;
             }
+
         }
         private static void LastHit()
         {
-            var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["lasthitW"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["qLasthit"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["qLasthitW"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {
@@ -250,8 +256,8 @@ namespace KatarinaHu3
         }
         private static void LaneClear()
         {
-            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["laneclearW"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["qLaneclear"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["wLaneclear"].Cast<CheckBox>().CurrentValue;
 
             if (useQ && Q.IsReady())
             {

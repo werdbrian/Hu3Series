@@ -110,27 +110,34 @@ namespace TristanaHu3
         public static float EDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1.0 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 100 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
+                                140 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
+                                170 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
+                                210 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
+                                240 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod }[Program.E.Level]));
         }
 
         private static void KillSteal()
         {
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(R.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
+            var target = TargetSelector.GetTarget(1000, DamageType.Magical);
+            var estacks = target.Buffs.Find(buff => buff.Name == "tristanaecharge").Count;
+            var erdamage = (EDamage(target) * ((0.30 * estacks) + 1) + RDamage(target));
+
+            if (R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= RDamage(target))
             {
-                if (R.IsReady() && useR && R.Cast(target))
-                {
-                    R.Cast(target);
-                }
+                R.Cast(target);
             }
-            foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
+            if (W.IsReady() && useW && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && target.Health <= WDamage(target))
             {
-                if (W.IsReady() && useR && W.Cast(target))
-                {
-                    W.Cast(target);
-                }
+                R.Cast(target);
             }
+            if (W.IsReady() && useW && R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= erdamage)
+            {
+                R.Cast(target);
+            }
+
         }
         private static void Combo()
         {

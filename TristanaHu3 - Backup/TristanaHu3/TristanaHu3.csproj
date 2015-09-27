@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1A0E3991-8592-46E3-B0C7-57F1F6465ED7}</ProjectGuid>
+    <ProjectGuid>{1364DFD2-A371-4C5B-A221-78E26B3CF4B7}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TristanaHu3</RootNamespace>

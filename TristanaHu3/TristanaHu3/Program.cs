@@ -64,6 +64,7 @@ namespace TristanaHu3
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
+            SettingsMenu.Add("killstealER", new CheckBox("Use E+R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawE", new CheckBox("Draw E"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
@@ -121,6 +122,7 @@ namespace TristanaHu3
         {
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
+            var useER = SettingsMenu["killstealER"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(1000, DamageType.Magical);
             var estacks = target.Buffs.Find(buff => buff.Name == "tristanaecharge").Count;
             var erdamage = (EDamage(target) * ((0.30 * estacks) + 1) + RDamage(target));
@@ -133,7 +135,7 @@ namespace TristanaHu3
             {
                 R.Cast(target);
             }
-            if (W.IsReady() && useW && R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= erdamage)
+            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= erdamage)
             {
                 R.Cast(target);
             }

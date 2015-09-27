@@ -201,20 +201,26 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+            var minion = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsEnemy && !m.IsDead && m.IsMinion);
+            foreach (var Minion in minion)
             {
-                Q.Cast(minion);
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && Minion.Health <= GetDamage(SpellSlot.Q, Minion))
+                {
+                    Q.Cast(Minion);
+                }
             }
         }
         private static void LaneClear()
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+            var minion = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsEnemy && !m.IsDead && m.IsMinion);
+            foreach (var Minion in minion)
             {
-                Q.Cast(minion);
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && Minion.Health <= GetDamage(SpellSlot.Q, Minion))
+                {
+                    Q.Cast(Minion);
+                }
             }
         }
         private static void Drawing_OnDraw(EventArgs args)

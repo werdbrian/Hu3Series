@@ -37,7 +37,6 @@ namespace TristanaHu3
             if (Player.Instance.ChampionName != "Tristana")
                 return;
 
-            TargetSelector.Init();
             Bootstrap.Init(null);
             uint level = (uint)Player.Instance.Level;
             Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
@@ -134,7 +133,6 @@ namespace TristanaHu3
                 }
             }
         }
-
         private static void Combo()
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;

@@ -42,7 +42,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.2");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.3");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -77,6 +77,7 @@ namespace EzrealHu3
         private static void Game_OnTick(EventArgs args)
         {
             W.AllowedCollisionCount = int.MaxValue;
+
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -195,7 +196,7 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
                 if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
@@ -206,7 +207,7 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
                 if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
@@ -215,6 +216,8 @@ namespace EzrealHu3
         }
         private static void Drawing_OnDraw(EventArgs args)
         {
+            if (_Player.IsDead) return;
+
             if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
             {
                 new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);

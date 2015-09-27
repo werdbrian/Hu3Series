@@ -76,8 +76,6 @@ namespace EzrealHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
-            W.AllowedCollisionCount = int.MaxValue;
-
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -159,6 +157,8 @@ namespace EzrealHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
+
+            W.AllowedCollisionCount = int.MaxValue;
 
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.High)
             {

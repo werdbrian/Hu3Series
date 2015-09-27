@@ -42,7 +42,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 1.2");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.0");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -62,10 +62,9 @@ namespace EzrealHu3
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
-            SettingsMenu.Add("killstealQ", new CheckBox("Use Q KillSteal"));
-            SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
-            SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
+            SettingsMenu.Add("ksQ", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.Add("ksW", new CheckBox("Use W KillSteal"));
+            SettingsMenu.Add("ksR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
@@ -77,6 +76,7 @@ namespace EzrealHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
+            W.AllowedCollisionCount = int.MaxValue;
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -93,62 +93,68 @@ namespace EzrealHu3
             {
                 LaneClear();
             }
-            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
+            var useQ = SettingsMenu["ksQ"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["ksW"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["ksR"].Cast<CheckBox>().CurrentValue;
+            if (useQ || useW || useR)
             {
                 KillSteal();
             }
         }
         //Damages
-        public static float QDamage(Obj_AI_Base target)
+        public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
         {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 30, 50, 70, 90, 110 }[Program.Q.Level] + 0.4 * _Player.FlatMagicDamageMod + 1.1 * _Player.FlatPhysicalDamageMod));
+            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
+            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
+            if (spell == SpellSlot.Q)
+            {
+                if (!Q.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 35f + 20f * (Q.Level - 1) + 40 / 100 * ap + 110 / 100 * ad);
+            }
+            else if (spell == SpellSlot.W)
+            {
+                if (!W.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 70f + 45f * (W.Level - 1) + 80 / 100 * ap);
+            }
+            else if (spell == SpellSlot.E)
+            {
+                if (!E.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 110f + 35f * (E.Level - 1) + 75 / 100 * ap);
+            }
+            else if (spell == SpellSlot.R)
+            {
+                if (!R.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 350f + 150f * (R.Level - 1) + 90 / 100 * ap + 100 / 100 * ad);
+            }
+
+            return 0;
         }
-        public static float WDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 65, 110, 155, 200, 245 }[Program.W.Level] + 0.8 * _Player.FlatMagicDamageMod));
-        }
-        public static float RDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 315, 465, 595 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod + 1.0 * _Player.FlatPhysicalDamageMod));
-        }
+
         private static void KillSteal()
         {
             var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium
+                && target.Health <= GetDamage(SpellSlot.Q, target)) 
             {
-                foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= QDamage(hero)))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        Q.Cast(target);
-                    }
-                }
+                Q.Cast(target);
             }
-            if (useW && W.IsReady())
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.Medium
+                && target.Health <= GetDamage(SpellSlot.W, target))
             {
-                foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= WDamage(hero)))
-                {
-                    if (W.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        W.Cast(target);
-                    }
-                }
+                W.Cast(target);
             }
-            if (useR && R.IsReady())
+            if (useR && R.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && R.GetPrediction(target).HitChance >= HitChance.High
+                && target.Health <= GetDamage(SpellSlot.R, target))
             {
-                foreach (var target in HeroManager.Enemies.Where(hero => hero.IsValidTarget(R.Range) && !hero.IsDead && !hero.IsZombie && hero.Health <= RDamage(hero)))
-                {
-                    if (R.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        R.Cast(target);
-                    }
-                }
+                R.Cast(target);
             }
         }
 
@@ -157,37 +163,20 @@ namespace EzrealHu3
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        Q.Cast(target);
-                    }
-                }
+                Q.Cast(target);
             }
-            if (useW && W.IsReady())
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.Medium)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (W.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        W.Cast(target);
-                    }
-                }
+                W.Cast(target);
             }
-
-            if (useR && R.IsReady())
+            if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.High
+                && target.Health <= GetDamage(SpellSlot.R, target))
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (R.GetPrediction(target).HitChance >= HitChance.High && target.Health < RDamage(target))
-                    {
-                        R.Cast(target);
-                    }
-                }
+                R.Cast(target);
             }
         }
 
@@ -196,26 +185,15 @@ namespace EzrealHu3
 
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady())
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        Q.Cast(target);
-                    }
-                }
-            }
+            var target = TargetSelector.GetTarget(1300, DamageType.Physical);
 
-            if (useW && W.IsReady())
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (W.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        W.Cast(target);
-                    }
-                }
+                Q.Cast(target);
+            }
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.Medium)
+            {
+                W.Cast(target);
             }
         }
 
@@ -223,32 +201,20 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            if(useQ && Q.IsReady())
-                {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsInAutoAttackRange(a) && a.IsValidTarget(Q.Range)))
-                {
-                    if (Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
-                    {
-                        Q.Cast(minion);
-                    }
-                }
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
+            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+            {
+                Q.Cast(minion);
             }
-            
         }
         private static void LaneClear()
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-            if (useQ && Q.IsReady())
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
+            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
             {
-                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(a => a.IsEnemy && !a.IsInAutoAttackRange(a) && a.IsValidTarget(Q.Range)))
-                {
-                    if (Player.Instance.ManaPercent > mana && minion.Health <= QDamage(minion))
-                    {
-                        Q.Cast(minion);
-                    }
-
-                }
+                Q.Cast(minion);
             }
         }
         private static void Drawing_OnDraw(EventArgs args)

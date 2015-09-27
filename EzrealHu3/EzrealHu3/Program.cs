@@ -42,7 +42,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.1");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.2");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -93,13 +93,7 @@ namespace EzrealHu3
             {
                 LaneClear();
             }
-            var useQ = SettingsMenu["ksQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["ksW"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["ksR"].Cast<CheckBox>().CurrentValue;
-            if (useQ || useW || useR)
-            {
                 KillSteal();
-            }
         }
         //Damages
         public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
@@ -201,7 +195,7 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.IsEnemy && !m.IsDead);
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
                 if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
@@ -212,7 +206,7 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.IsEnemy && !m.IsDead);
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
                 if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {

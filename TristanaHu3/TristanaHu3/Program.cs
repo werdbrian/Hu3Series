@@ -9,6 +9,7 @@ using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
 using SharpDX;
+using EloBuddy.SDK.Utils;
 
 
 namespace TristanaHu3
@@ -25,6 +26,7 @@ namespace TristanaHu3
         static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
+            Bootstrap.Init(null);
         }
 
         public static AIHeroClient _Player
@@ -36,7 +38,7 @@ namespace TristanaHu3
         {
             if (Player.Instance.ChampionName != "Tristana")
                 return;
-            Bootstrap.Init(null);
+            
             uint level = (uint)Player.Instance.Level;
             Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
             W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, (int)0.25f, Int32.MaxValue, (int)80f);
@@ -105,28 +107,37 @@ namespace TristanaHu3
             }
             
         }
-        public static float WDamage(Obj_AI_Base target)
+        public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
         {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 80, 100, 130, 155, 180 }[Program.W.Level] + 0.5 * _Player.FlatMagicDamageMod));
-        }
+            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
+            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
+            if (spell == SpellSlot.Q)
+            {
+                if (!Q.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 0f + 0f * (Q.Level - 1) + 0 / 100 * ap);
+            }
+            else if (spell == SpellSlot.W)
+            {
+                if (!W.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 80f + 25f * (W.Level - 1) + 50 / 100 * ap);
+            }
+            else if (spell == SpellSlot.E)
+            {
+                if (!E.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 110f + 35f * (E.Level - 1) + 50 / 100 + 15 /100 * (E.Level - 1) + 75 / 100 * ap);
+            }
+            else if (spell == SpellSlot.R)
+            {
+                if (!R.IsReady())
+                    return 0;
+                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 300f + 100f * (R.Level - 1) + 100 / 100 * ap);
+            }
 
-        public static float RDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 280, 380, 480 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod));
+            return 0;
         }
-
-        public static float EDamage(Obj_AI_Base target)
-        {
-            return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 100 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
-                                140 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
-                                170 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
-                                210 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod,
-                                240 + 0.75 * _Player.FlatMagicDamageMod + 0.50 * _Player.FlatPhysicalDamageMod }[Program.E.Level]));
-        }
-
         private static void KillSteal()
         {
             var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
@@ -134,16 +145,16 @@ namespace TristanaHu3
             var useR = SettingsMenu["Rkill"].Cast<CheckBox>().CurrentValue;
             var useER = SettingsMenu["ERkill"].Cast<CheckBox>().CurrentValue;
 
-            if (R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= RDamage(target))
+            if (R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetDamage(SpellSlot.Q, target))
             {
                 R.Cast(target);
             }
-            if (W.IsReady() && useW && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && target.Health <= WDamage(target))
+            if (W.IsReady() && useW && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetDamage(SpellSlot.W, target))
             {
                 W.Cast(target);
             }
             var eStacks = target.Buffs.Find(b => b.Name == "tristanaecharge").Count;
-            var ERdamage = (EDamage(target) * ((0.30 * eStacks) + 1) + RDamage(target));
+            var ERdamage = (GetDamage(SpellSlot.E ,target) * ((0.30 * eStacks) + 1) + (GetDamage(SpellSlot.R, target)));
             if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= ERdamage)
             {              
                 R.Cast(target);

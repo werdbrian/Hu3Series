@@ -38,7 +38,6 @@ namespace KatarinaHu3
             if (Player.Instance.ChampionName != "Katarina")
                 return;
 
-            TargetSelector.Init();
             Bootstrap.Init(null);
             Q = new Spell.Targeted(SpellSlot.Q, 675);
             W = new Spell.Active(SpellSlot.W, 370);

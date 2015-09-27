@@ -24,6 +24,7 @@ namespace ThreshHu3
         static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
+            Bootstrap.Init(null);
         }
 
         public static AIHeroClient _Player
@@ -35,9 +36,6 @@ namespace ThreshHu3
         {
             if (Player.Instance.ChampionName != "Thresh")
                 return;
-
-            TargetSelector.Init();
-            Bootstrap.Init(null);
 
             Q = new Spell.Skillshot(SpellSlot.Q, 1080, SkillShotType.Linear, (int)0.35f, 1200, 60);
             Q2 = new Spell.Active(SpellSlot.Q, 1300);

@@ -44,7 +44,7 @@ namespace TristanaHu3
             R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             Menu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            Menu.AddGroupLabel("Tristana Hu3 2.2");
+            Menu.AddGroupLabel("Tristana Hu3 2.3");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
@@ -58,7 +58,6 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
-            SettingsMenu.Add("laneclearQtower", new CheckBox("Use Q on Towers"));
             SettingsMenu.Add("laneclearEtower", new CheckBox("Use E on Towers"));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
@@ -90,7 +89,10 @@ namespace TristanaHu3
             {
                 LaneClear();
             }
-            if (SettingsMenu["killsteal"].Cast<CheckBox>().CurrentValue)
+            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
+            var useER = SettingsMenu["killstealER"].Cast<CheckBox>().CurrentValue;
+            if (useW || useR || useER)
             {
                 KillSteal();
             }
@@ -176,11 +178,10 @@ namespace TristanaHu3
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
-            var useQtower = SettingsMenu["laneclearQtower"].Cast<CheckBox>().CurrentValue;
             var useEtower = SettingsMenu["laneclearEtower"].Cast<CheckBox>().CurrentValue;
 
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
-            var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < E.Range);
+            var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < E.Range);
             if (minion == null && tower == null) return;
 
             if (useE && E.IsReady() && (tower == null))
@@ -194,10 +195,6 @@ namespace TristanaHu3
             if (useEtower && E.IsReady())
             {
                 E.Cast(tower);
-            }
-            if (tower.HasBuff("tristanaecharge"))
-            {
-                Q.Cast();
             }
         }
         private static void Drawing_OnDraw(EventArgs args)

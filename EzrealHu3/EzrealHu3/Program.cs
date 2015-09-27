@@ -36,9 +36,6 @@ namespace EzrealHu3
             if (Player.Instance.ChampionName != "Ezreal")
                 return;
 
-            TargetSelector.Init();
-            Bootstrap.Init(null);
-
             Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
             W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, (int)0.25f, 1600, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 700);

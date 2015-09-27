@@ -42,7 +42,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.0");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.1");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -173,7 +173,7 @@ namespace EzrealHu3
             {
                 W.Cast(target);
             }
-            if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.High
+            if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && R.GetPrediction(target).HitChance >= HitChance.High
                 && target.Health <= GetDamage(SpellSlot.R, target))
             {
                 R.Cast(target);
@@ -201,7 +201,8 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["lasthitQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
                 if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
                     Q.Cast(minion);
@@ -211,14 +212,12 @@ namespace EzrealHu3
         {
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-            var minion = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.IsEnemy && !m.IsDead && m.IsMinion);
-            foreach (var Minion in minion)
-            {
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && Minion.Health <= GetDamage(SpellSlot.Q, Minion))
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
-                    Q.Cast(Minion);
+                    Q.Cast(minion);
                 }
-            }
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

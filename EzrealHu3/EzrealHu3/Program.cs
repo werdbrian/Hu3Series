@@ -198,10 +198,14 @@ namespace EzrealHu3
             var mana = SettingsMenu["lasthitMana"].Cast<Slider>().CurrentValue;
             var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+            {
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange) 
+                    && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
                     Q.Cast(minion);
                 }
+            }
+
         }
         private static void LaneClear()
         {
@@ -209,26 +213,33 @@ namespace EzrealHu3
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
             var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
-                if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+            {
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange)
+                    && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
                     Q.Cast(minion);
                 }
+            }
         }
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (_Player.IsDead) return;
 
-            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            var drawQ = SettingsMenu["Qd"].Cast<CheckBox>().CurrentValue;
+            var drawW = SettingsMenu["Wd"].Cast<CheckBox>().CurrentValue;
+            var drawR = SettingsMenu["Rd"].Cast<CheckBox>().CurrentValue;
+
+            if (drawQ)
             {
                 new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            if (drawW)
             {
-                new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Black, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawR"].Cast<CheckBox>().CurrentValue)
+            if (drawR)
             {
-                new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Pink, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
     }

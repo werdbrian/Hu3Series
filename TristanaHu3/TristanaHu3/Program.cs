@@ -60,15 +60,16 @@ namespace TristanaHu3
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("Qlc", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("Elc", new CheckBox("Use E on LaneClear"));
-            SettingsMenu.Add("Etower", new CheckBox("Use E on Towers"));         
+            SettingsMenu.Add("Etower", new CheckBox("Use E on Towers"));
+            SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Spells On LaneClear", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("Wkill", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("Rkill", new CheckBox("Use R KillSteal"));
             SettingsMenu.Add("ERkill", new CheckBox("Use E+R KillSteal"));
             SettingsMenu.AddLabel("Draw");
-            SettingsMenu.Add("drawE", new CheckBox("Draw E"));
-            SettingsMenu.Add("drawW", new CheckBox("Draw W"));
-            SettingsMenu.Add("drawR", new CheckBox("Draw R"));
+            SettingsMenu.Add("Ed", new CheckBox("Draw E"));
+            SettingsMenu.Add("Wd", new CheckBox("Draw W"));
+            SettingsMenu.Add("Rd", new CheckBox("Draw R"));
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -183,15 +184,16 @@ namespace TristanaHu3
             var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Elc"].Cast<CheckBox>().CurrentValue;
             var useETower = SettingsMenu["Etower"].Cast<CheckBox>().CurrentValue;
-            if (useE && E.IsReady())
+            var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
+            if (useE && E.IsReady() && Player.Instance.ManaPercent > mana)
             {
                 E.Cast(minion);
             }
-            if (useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
             {
                 Q.Cast();
             }
-            if (useETower && E.IsReady() && minion == null)
+            if (useETower && E.IsReady() && minion == null && Player.Instance.ManaPercent > mana)
             {
                 E.Cast(tower);
                 Q.Cast();
@@ -200,17 +202,23 @@ namespace TristanaHu3
         }
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            if (_Player.IsDead) return;
+
+            var drawE = SettingsMenu["Ed"].Cast<CheckBox>().CurrentValue;
+            var drawW = SettingsMenu["Wd"].Cast<CheckBox>().CurrentValue;
+            var drawR = SettingsMenu["Rd"].Cast<CheckBox>().CurrentValue;
+
+            if (drawE)
             {
-                new Circle() { Color = Color.Red, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            if (drawW)
             {
-                new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Black, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawR"].Cast<CheckBox>().CurrentValue)
+            if (drawR)
             {
-                new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Pink, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
     }

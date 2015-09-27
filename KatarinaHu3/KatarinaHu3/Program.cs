@@ -59,8 +59,8 @@ namespace KatarinaHu3
             SettingsMenu.Add("qLasthit", new CheckBox("Use Q on Last Hit"));
             SettingsMenu.Add("wLasthit", new CheckBox("Use W on Last Hit"));
             SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("qLaneclear", new CheckBox("Use Q on Last Hit"));
-            SettingsMenu.Add("wLaneclear", new CheckBox("Use W on Last Hit"));
+            SettingsMenu.Add("qLaneclear", new CheckBox("Use Q on Lane Clear"));
+            SettingsMenu.Add("wLaneclear", new CheckBox("Use W on Lane Clear"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
@@ -98,8 +98,6 @@ namespace KatarinaHu3
             {
                 LastHit();
             }
-
-            CheckUlt();
         }
         //Damages      
         public static float QDamage(Obj_AI_Base target)
@@ -166,38 +164,29 @@ namespace KatarinaHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(Q.Range, EloBuddy.DamageType.Magical);
 
-            if(useQ && Q.IsReady() && ulting == false)
+            if (target.IsValidTarget())
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead))
+                if (useQ && Q.IsReady() && Q.IsInRange(target))
                 {
                     Q.Cast(target);
                 }
-            }
-            if (useE && E.IsReady() && ulting == false)
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead))
-                {
-                    E.Cast(target);
-                }
-            }
-            if (useW && W.IsReady() && ulting == false)
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead))
+                if (useW && W.IsInRange(target) && W.IsReady())
                 {
                     W.Cast();
                 }
             }
-            if (useR && !Q.IsReady() && !W.IsReady() && !E.IsReady() && ulting == false)
-            {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead))
-                {
-                    Orbwalker.DisableAttacking = true;
-                    Orbwalker.DisableMovement = true;
-                    ulting = true;
-                    R.Cast();
-                }
-            }
+            //if (useR && !Q.IsReady() && !W.IsReady() && !E.IsReady() && ulting == false)
+            // {
+            //     foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead))
+            //     {
+            //         Orbwalker.DisableAttacking = true;
+            //         Orbwalker.DisableMovement = true;
+            //        ulting = true;
+            //        R.Cast();
+            //    }
+            //}
         }
         private static void Harass()
         {

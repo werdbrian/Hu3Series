@@ -19,7 +19,7 @@ namespace TristanaHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Targeted R;
-        public static Menu Menu, SettingsMenu, ActivatorMenu;
+        public static Menu Menu, SettingsMenu, KeysMenu;
 
 
         static void Main(string[] args)
@@ -36,77 +36,85 @@ namespace TristanaHu3
         {
             if (Player.Instance.ChampionName != "Tristana")
                 return;
-
+            Bootstrap.Init(null);
             uint level = (uint)Player.Instance.Level;
             Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
-            W = new Spell.Skillshot(SpellSlot.W, 880, SkillShotType.Circular, (int)0.50f, Int32.MaxValue, (int)250f);
+            W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, (int)0.25f, Int32.MaxValue, (int)80f);
             E = new Spell.Targeted(SpellSlot.E, 543 + level * 7);
             R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             Menu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            Menu.AddGroupLabel("Tristana Hu3 2.3");
+            Menu.AddGroupLabel("Tristana Hu3 0.1");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
-            SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
-            SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
+            SettingsMenu.Add("Qc", new CheckBox("Use Q on Combo"));
+            SettingsMenu.Add("Ec", new CheckBox("Use E on Combo"));         
             SettingsMenu.AddLabel("Harass");
-            SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
+            SettingsMenu.Add("Qh", new CheckBox("Use Q on Harass"));
+            SettingsMenu.Add("Eh", new CheckBox("Use E on Harass"));          
             SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
-            SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
-            SettingsMenu.Add("laneclearEtower", new CheckBox("Use E on Towers"));
+            SettingsMenu.Add("Qlc", new CheckBox("Use Q on LaneClear"));
+            SettingsMenu.Add("Elc", new CheckBox("Use E on LaneClear"));
+            SettingsMenu.Add("Etower", new CheckBox("Use E on Towers"));         
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
-            SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
-            SettingsMenu.Add("killstealER", new CheckBox("Use E+R KillSteal"));
+            SettingsMenu.Add("Wkill", new CheckBox("Use W KillSteal"));
+            SettingsMenu.Add("Rkill", new CheckBox("Use R KillSteal"));
+            SettingsMenu.Add("ERkill", new CheckBox("Use E+R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawE", new CheckBox("Draw E"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
             SettingsMenu.Add("drawR", new CheckBox("Draw R"));
 
-
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
 
         }
-
         private static void Game_OnTick(EventArgs args)
         {
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
                 Harass();
             }
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
                 LaneClear();
             }
-            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
-            var useER = SettingsMenu["killstealER"].Cast<CheckBox>().CurrentValue;
-            if (useW || useR || useER)
-            {
-                KillSteal();
-            }
+            
+            KillSteal();
         }
-          
+        private static void Combo()
+        {
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
+            var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
+
+            if (E.IsReady() && useE && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
+            {
+                E.Cast(target);
+            }
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
+            {
+                Q.Cast();
+            }
+            
+        }
         public static float WDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 80, 105, 130, 155, 180 }[Program.W.Level] + 0.5 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 80, 100, 130, 155, 180 }[Program.W.Level] + 0.5 * _Player.FlatMagicDamageMod));
         }
 
         public static float RDamage(Obj_AI_Base target)
         {
             return _Player.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 300, 400, 500 }[Program.R.Level] + 1.0 * _Player.FlatMagicDamageMod));
+                (float)(new[] { 280, 380, 480 }[Program.R.Level] + 0.9 * _Player.FlatMagicDamageMod));
         }
 
         public static float EDamage(Obj_AI_Base target)
@@ -121,12 +129,10 @@ namespace TristanaHu3
 
         private static void KillSteal()
         {
-            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
-            var useER = SettingsMenu["killstealER"].Cast<CheckBox>().CurrentValue;
-            var target = TargetSelector.GetTarget(1000, DamageType.Magical);
-            var estacks = target.Buffs.Find(buff => buff.Name == "tristanaecharge").Count;
-            var erdamage = (EDamage(target) * ((0.30 * estacks) + 1) + RDamage(target));
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
+            var useW = SettingsMenu["Wkill"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["Rkill"].Cast<CheckBox>().CurrentValue;
+            var useER = SettingsMenu["ERkill"].Cast<CheckBox>().CurrentValue;
 
             if (R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= RDamage(target))
             {
@@ -134,54 +140,38 @@ namespace TristanaHu3
             }
             if (W.IsReady() && useW && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && target.Health <= WDamage(target))
             {
+                W.Cast(target);
+            }
+            var eStacks = target.Buffs.Find(b => b.Name == "tristanaecharge").Count;
+            var ERdamage = (EDamage(target) * ((0.30 * eStacks) + 1) + RDamage(target));
+            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= ERdamage)
+            {              
                 R.Cast(target);
             }
-            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= erdamage)
-            {
-                R.Cast(target);
-            }
-
         }
-        private static void Combo()
-        {
-            var target = TargetSelector.GetTarget(1000, DamageType.Physical);
-            if (target == null) return;
-            var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
-            {
-                E.Cast(target);
-            }
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
-            {
-                Q.Cast();
-            }
-        }
-
         private static void Harass()
         {
-            var target = TargetSelector.GetTarget(1000, DamageType.Physical);
-            if (target == null) return;
-            var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
-            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
+            var useQ = SettingsMenu["Qh"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Eh"].Cast<CheckBox>().CurrentValue;
+
+            if (E.IsReady() && useE && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
             {
                 E.Cast(target);
             }
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && target.HasBuff("tristanaecharge"))
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && target.HasBuff("tristanaecharge") && !target.IsDead && !target.IsZombie)
             {
                 Q.Cast();
             }
+
         }
         private static void LaneClear()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(m => m.IsEnemy && !m.IsDead && m.Distance(_Player) < E.Range);
-            var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(m => m.IsEnemy && !m.IsDead && m.Distance(_Player) < E.Range);
-
-            var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
-            var useEtower = SettingsMenu["laneclearEtower"].Cast<CheckBox>().CurrentValue;
-
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
+            var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
+            var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Elc"].Cast<CheckBox>().CurrentValue;
+            var useETower = SettingsMenu["Etower"].Cast<CheckBox>().CurrentValue;
             if (useE && E.IsReady())
             {
                 E.Cast(minion);
@@ -190,10 +180,12 @@ namespace TristanaHu3
             {
                 Q.Cast();
             }
-            if (useEtower && E.IsReady())
+            if (useETower && E.IsReady() && minion == null)
             {
                 E.Cast(tower);
+                Q.Cast();
             }
+
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

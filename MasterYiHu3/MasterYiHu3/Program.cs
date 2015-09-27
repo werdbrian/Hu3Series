@@ -41,7 +41,7 @@ namespace MasterYiHu3
             Q = new Spell.Targeted(SpellSlot.Q, 600);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
-            R = new Spell.Active(SpellSlot.R);
+            R = new Spell.Active(SpellSlot.R, 500);
 
             Menu = MainMenu.AddMenu("MasterYiHu3", "masteryihu3");
             Menu.AddGroupLabel("MasterYi Hu3 Test Version 0.2");
@@ -114,15 +114,15 @@ namespace MasterYiHu3
             var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["Rc"].Cast<CheckBox>().CurrentValue;
 
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+            if (useQ && Q.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(Q.Range))
             {
                 Q.Cast(target);
             }
-            if (useE && E.IsReady() && target.IsValidTarget(150))
+            if (useE && E.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(150))
             {
                 E.Cast();
             }
-            if (useR && R.IsReady() && target.IsValidTarget(200))
+            if (useR && R.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(R.Range))
             {
                 R.Cast();
             }
@@ -132,7 +132,7 @@ namespace MasterYiHu3
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range))
+            if (useQ && Q.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(Q.Range))
             {
                 Q.Cast(target);
             }
@@ -140,9 +140,10 @@ namespace MasterYiHu3
 
         private static void LaneClear()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
             var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady() && minion.Health <= GetDamage(SpellSlot.Q, minion))
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+                if (useQ && Q.IsReady() && minion.Health <= GetDamage(SpellSlot.Q, minion))
             {
                 Q.Cast(minion);
             }
@@ -150,12 +151,13 @@ namespace MasterYiHu3
 
         private static void LastHit()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < Q.Range);
             var useQ = SettingsMenu["Qlh"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady() && minion.Health <= GetDamage(SpellSlot.Q, minion))
-            {
-                Q.Cast(minion);
-            }
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+                if (useQ && Q.IsReady() && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                {
+                    Q.Cast(minion);
+                }
         }
 
         private static void Drawing_OnDraw(EventArgs args)

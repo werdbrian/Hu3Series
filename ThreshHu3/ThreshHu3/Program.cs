@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -109,58 +105,35 @@ namespace ThreshHu3
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
             var minR = SettingsMenu["comboRmin"].Cast<Slider>().CurrentValue;
+            var target = TargetSelector.GetTarget(1300, DamageType.Mixed);
 
-            if (useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        Q.Cast(target);
-                    }
-                }
+               Q.Cast(target);
             }
 
-            if (useQ2)
+            if (useQ2 && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range) && target.IsValidTarget(Q2.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q2.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (useQ2 && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range))
-                    {
-                        Q2.Cast();
-                    }
-                }
+                Q2.Cast();
             }
 
-            if (useE && E.IsReady())
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie && E.GetPrediction(target).HitChance >= HitChance.Medium)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (E.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
-                        var predictionE = E.GetPrediction(target);
-                        var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
-                        var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
-                        var v3 = new Vector3(
-                            Player.Instance.ServerPosition.X + x,
-                            Player.Instance.ServerPosition.Y + y,
-                            Player.Instance.ServerPosition.Z);
+                var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+                var predictionE = E.GetPrediction(target);
+                var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
+                var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
+                var v3 = new Vector3(
+                Player.Instance.ServerPosition.X + x,
+                Player.Instance.ServerPosition.Y + y,
+                Player.Instance.ServerPosition.Z);
 
-                        E.Cast(getOutRange ? predictionE.CastPosition : v3);
-                    }
-                }
+                       E.Cast(getOutRange ? predictionE.CastPosition : v3);
             }
 
-            if (useR && R.IsReady())
+            if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && Player.Instance.CountEnemiesInRange(R.Range) >= minR)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(R.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Player.Instance.CountEnemiesInRange(R.Range) >= minR)
-                    {
-                        R.Cast();
-                    }
-                }
+                 R.Cast();
             }
         }
 
@@ -170,52 +143,38 @@ namespace ThreshHu3
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useQ2 = SettingsMenu["harassQ2"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(1300, DamageType.Mixed);
 
-            if (useQ && Q.IsReady())
+
+            if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        Q.Cast(target);
-                    }
-                }
+                Q.Cast(target);
             }
 
-            if (useQ2)
+            if (useQ2 && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range) && target.IsValidTarget(Q2.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q2.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (useQ2 && target.HasBuff("ThreshQ") && !target.IsValidTarget(E.Range))
-                    {
-                        Q2.Cast();
-                    }
-                }
+                Q2.Cast();
             }
 
-            if (useE && E.IsReady())
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie && E.GetPrediction(target).HitChance >= HitChance.Medium)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (E.GetPrediction(target).HitChance >= HitChance.Medium)
-                    {
-                        var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
-                        var predictionE = E.GetPrediction(target);
-                        var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
-                        var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
-                        var v3 = new Vector3(
-                            Player.Instance.ServerPosition.X + x,
-                            Player.Instance.ServerPosition.Y + y,
-                            Player.Instance.ServerPosition.Z);
+                var getOutRange = Player.Instance.Distance(target) < target.Distance(Game.CursorPos);
+                var predictionE = E.GetPrediction(target);
+                var x = Player.Instance.ServerPosition.X - target.ServerPosition.X;
+                var y = Player.Instance.ServerPosition.Y - target.ServerPosition.Y;
+                var v3 = new Vector3(
+                Player.Instance.ServerPosition.X + x,
+                Player.Instance.ServerPosition.Y + y,
+                Player.Instance.ServerPosition.Z);
 
-                        E.Cast(getOutRange ? predictionE.CastPosition : v3);
-                    }
-                }
+                E.Cast(getOutRange ? predictionE.CastPosition : v3);
             }
         }
 
         private static void Drawing_OnDraw(EventArgs args)
         {
+            if (_Player.IsDead) return;
+
             if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
             {
                 new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);

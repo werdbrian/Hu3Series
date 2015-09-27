@@ -36,10 +36,10 @@ namespace EzrealHu3
             if (Player.Instance.ChampionName != "Ezreal")
                 return;
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
-            W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, (int)0.25f, 1600, (int)80f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, 250, Int32.MaxValue, 60);
+            W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, 250, Int32.MaxValue, 80);
             E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, (int)1f, 2000, (int)(160f));
+            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 1, Int32.MaxValue, 160);
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
             EzrealMenu.AddGroupLabel("Ezreal Hu3 3.3");
@@ -160,11 +160,11 @@ namespace EzrealHu3
             var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.High)
             {
                 Q.Cast(target);
             }
-            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.Medium)
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.High)
             {
                 W.Cast(target);
             }

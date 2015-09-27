@@ -60,7 +60,6 @@ namespace TristanaHu3
             SettingsMenu.Add("laneclearE", new CheckBox("Use E on LaneClear"));
             SettingsMenu.Add("laneclearEtower", new CheckBox("Use E on Towers"));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("killsteal", new CheckBox("KillSteal"));
             SettingsMenu.Add("killstealW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("killstealR", new CheckBox("Use R KillSteal"));
             SettingsMenu.Add("killstealER", new CheckBox("Use E+R KillSteal"));
@@ -155,7 +154,7 @@ namespace TristanaHu3
             }
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
-                Q.Cast(target);
+                Q.Cast();
             }
         }
 
@@ -176,15 +175,14 @@ namespace TristanaHu3
         }
         private static void LaneClear()
         {
+            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(m => m.IsEnemy && !m.IsDead && m.Distance(_Player) < E.Range);
+            var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(m => m.IsEnemy && !m.IsDead && m.Distance(_Player) < E.Range);
+
             var useQ = SettingsMenu["laneclearQ"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["laneclearE"].Cast<CheckBox>().CurrentValue;
             var useEtower = SettingsMenu["laneclearEtower"].Cast<CheckBox>().CurrentValue;
 
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < E.Range);
-            var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < E.Range);
-            if (minion == null && tower == null) return;
-
-            if (useE && E.IsReady() && (tower == null))
+            if (useE && E.IsReady())
             {
                 E.Cast(minion);
             }

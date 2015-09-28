@@ -154,13 +154,30 @@ namespace TristanaHu3
             {
                 W.Cast(target);
             }
-            var eStacks = target.Buffs.Find(b => b.Name == "tristanaecharge").Count;
-            var ERdamage = (GetDamage(SpellSlot.E ,target) * ((0.30 * eStacks) + 1) + (GetDamage(SpellSlot.R, target)));
-            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= ERdamage)
+            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetEdmg(target) + GetDamage(SpellSlot.R, target))
             {              
                 R.Cast(target);
             }
         }
+
+        private static BuffInstance GetECharge(Obj_AI_Base target)
+        {
+            return target.Buffs.Find(x => x.DisplayName == "TristanaECharge");
+        }
+
+        private static double GetEdmg(Obj_AI_Base target)
+        {
+            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
+            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
+            if (target.GetBuffCount("TristanaECharge") != 0)
+            {
+                return (GetDamage(SpellSlot.E, target) * ((0.3 * target.GetBuffCount("TristanaECharge") + 1))
+                        + (ad) + (ap * 0.5));
+            }
+
+            return 0;
+        }
+
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);

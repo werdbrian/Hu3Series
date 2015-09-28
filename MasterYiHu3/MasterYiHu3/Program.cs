@@ -143,7 +143,7 @@ namespace MasterYiHu3
             var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
             var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
-                if (useQ && Q.IsReady() && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
             {
                 Q.Cast(minion);
             }
@@ -154,7 +154,7 @@ namespace MasterYiHu3
             var useQ = SettingsMenu["Qlh"].Cast<CheckBox>().CurrentValue;
             var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
-                if (useQ && Q.IsReady() && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
                     Q.Cast(minion);
                 }

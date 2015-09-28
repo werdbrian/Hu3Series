@@ -50,8 +50,7 @@ namespace KayleHu3
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("Qc", new CheckBox("Use Q on Combo"));
             SettingsMenu.Add("Wc", new CheckBox("Use W on Combo"));
-            SettingsMenu.Add("Ec", new CheckBox("Use W on Combo"));
-            SettingsMenu.Add("Rc", new CheckBox("Use R on Combo"));
+            SettingsMenu.Add("Ec", new CheckBox("Use E on Combo"));
             SettingsMenu.AddLabel("Harass");
             SettingsMenu.Add("Qh", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("Eh", new CheckBox("Use E on Harass"));
@@ -125,7 +124,7 @@ namespace KayleHu3
         private static void KillSteal()
         {
             var useQ = SettingsMenu["Qks"].Cast<CheckBox>().CurrentValue;
-            var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Mixed);
 
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetDamage(SpellSlot.Q, target))
             {
@@ -135,17 +134,80 @@ namespace KayleHu3
         }
         private static void Combo()
         {
-        }
-        private static void LaneClear()
-        {
-        }
-        private static void LastHit()
-        {
-        }
-        private static void Harass()
-        {
+            var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["Wc"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(R.Range, DamageType.Mixed);
+
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
+            {
+                Q.Cast(target);
+            }
+            if (useW && W.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie && Player.Instance.HealthPercent < 95)
+            {
+                W.Cast(_Player);
+            }
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
+            {
+                E.Cast();
+            }
         }
 
+        private static void Harass()
+        {
+            var useQ = SettingsMenu["Qh"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Eh"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(R.Range, DamageType.Mixed);
+
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
+            {
+                Q.Cast(target);
+            }
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
+            {
+                E.Cast();
+            }
+        }
+
+        private static void LaneClear()
+        {
+            var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Elc"].Cast<CheckBox>().CurrentValue;
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+            {
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                {
+                    Q.Cast(minion);
+                }
+                if (useE && E.IsReady() && minion.IsValidTarget(E.Range))
+                {
+                    E.Cast();
+                }
+            }
+        }
+
+        private static void LastHit()
+        {
+            var useQ = SettingsMenu["Qlh"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Elh"].Cast<CheckBox>().CurrentValue;
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+            {
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                {
+                    Q.Cast(minion);
+                }
+                if (useE && E.IsReady() && minion.IsValidTarget(650) && minion.Health <= GetDamage(SpellSlot.E, minion))
+                {
+                    E.Cast();
+                }
+            }
+        }    
+
+        private static void AutoUlt()
+        {
+        }
         private static void Drawing_OnDraw(EventArgs args)
         {
             if (_Player.IsDead) return;

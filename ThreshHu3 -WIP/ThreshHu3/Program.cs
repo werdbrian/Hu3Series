@@ -44,7 +44,7 @@ namespace ThreshHu3
             R = new Spell.Active(SpellSlot.R, 350);
 
             ThreshMenu = MainMenu.AddMenu("Thresh Hu3", "threshhu3");
-            ThreshMenu.AddGroupLabel("Thresh Hu3 0.2");
+            ThreshMenu.AddGroupLabel("Thresh Hu3 0.3");
             ThreshMenu.AddSeparator();
             ThreshMenu.AddLabel("Made By MarioGK");
             SettingsMenu = ThreshMenu.AddSubMenu("Settings", "Settings");
@@ -54,11 +54,11 @@ namespace ThreshHu3
             SettingsMenu.Add("Q2c", new CheckBox("Follow with Q on Combo"));
             SettingsMenu.Add("Ew", new CheckBox("Use E on Combo"));
             SettingsMenu.Add("Rc", new CheckBox("Use R on Combo"));
-            SettingsMenu.Add("comboRmin", new Slider("Min Enemies to use R", 2, 1, 5));
+            SettingsMenu.Add("Rmin", new Slider("Min Enemies to use R", 2, 1, 5));
             SettingsMenu.AddLabel("Harass");
-            SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassQ2", new CheckBox("Use Q Follow on Harass"));
-            SettingsMenu.Add("harassW", new CheckBox("Use E on Harass"));
+            SettingsMenu.Add("Qh", new CheckBox("Use Q on Harass"));
+            SettingsMenu.Add("Q2h", new CheckBox("Use Q Follow on Harass"));
+            SettingsMenu.Add("Eh", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
             SettingsMenu.Add("drawW", new CheckBox("Draw W"));
@@ -97,12 +97,12 @@ namespace ThreshHu3
         private static void Combo()
         {
 
-            var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
-            var useQ2 = SettingsMenu["comboQ2"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
-            var minR = SettingsMenu["comboRmin"].Cast<Slider>().CurrentValue;
+            var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
+            var useQ2 = SettingsMenu["Q2c"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["Wc"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["Rc"].Cast<CheckBox>().CurrentValue;
+            var minR = SettingsMenu["Rmin"].Cast<Slider>().CurrentValue;
             var target = TargetSelector.GetTarget(1300, DamageType.Mixed);
 
             if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
@@ -138,11 +138,10 @@ namespace ThreshHu3
         private static void Harass()
         {
 
-            var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
-            var useQ2 = SettingsMenu["harassQ2"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["Qh"].Cast<CheckBox>().CurrentValue;
+            var useQ2 = SettingsMenu["Q2h"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Eh"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(1300, DamageType.Mixed);
-
 
             if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {

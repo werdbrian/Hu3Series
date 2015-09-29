@@ -8,8 +8,6 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
-using SharpDX;
-using EloBuddy.SDK.Utils;
 
 
 namespace TristanaHu3
@@ -39,11 +37,11 @@ namespace TristanaHu3
             if (Player.Instance.ChampionName != "Tristana")
                 return;
             
-            uint level = (uint)Player.Instance.Level;
-            Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
+            
+            Q = new Spell.Active(SpellSlot.Q, 550);
             W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, 250, Int32.MaxValue, 80);
-            E = new Spell.Targeted(SpellSlot.E, 543 + level * 7);
-            R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
+            E = new Spell.Targeted(SpellSlot.E, 550);
+            R = new Spell.Targeted(SpellSlot.R, 550);
 
             Menu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
             Menu.AddGroupLabel("Tristana Hu3 V0.3");
@@ -77,6 +75,10 @@ namespace TristanaHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
+            if (_Player.IsDead || MenuGUI.IsChatOpen) return;
+
+            GetRange();
+
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
@@ -91,6 +93,13 @@ namespace TristanaHu3
             }
             
             KillSteal();
+        }
+        private static void GetRange()
+        {
+            uint level = (uint)Player.Instance.Level;
+            Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
+            E = new Spell.Targeted(SpellSlot.E, 543 + level * 7);
+            R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
         }
         private static void Combo()
         {

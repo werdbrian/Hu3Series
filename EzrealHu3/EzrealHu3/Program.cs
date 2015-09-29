@@ -78,8 +78,6 @@ namespace EzrealHu3
         {
             if (_Player.IsDead || MenuGUI.IsChatOpen) return;
 
-            GetRange();
-
             KillSteal();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
@@ -97,10 +95,6 @@ namespace EzrealHu3
             {
                 LaneClear();
             }          
-        }
-        private static void GetRange()
-        {
-
         }
         private static void KillSteal()
         {

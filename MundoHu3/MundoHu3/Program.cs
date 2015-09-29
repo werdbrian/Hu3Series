@@ -63,9 +63,9 @@ namespace MundoHu3
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
             SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("LastHit");
-            SettingsMenu.Add("Qlh", new CheckBox("Use Q on Last Hit"));
+            SettingsMenu.Add("Qlast", new CheckBox("Use Q on Last Hit"));
             SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("Qlc", new CheckBox("Use Q on Lane Clear"));
+            SettingsMenu.Add("Qlane", new CheckBox("Use Q on Lane Clear"));
             SettingsMenu.AddLabel("Auto Ult");
             SettingsMenu.Add("autoR", new CheckBox("Use R"));
             SettingsMenu.Add("healthAutoR", new Slider("Min Health To Ult", 10, 0, 100));

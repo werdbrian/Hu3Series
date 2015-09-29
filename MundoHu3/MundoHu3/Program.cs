@@ -203,7 +203,7 @@ namespace MundoHu3
 
             foreach (var minion in minions)
             {
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange) && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
                     Q.Cast(minion);
                 }
@@ -221,7 +221,7 @@ namespace MundoHu3
 
             foreach (var minion in minions)
             {
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange) && minion.Health <= GetDamage(SpellSlot.Q, minion))
                 {
                     Q.Cast(minion);
                 }

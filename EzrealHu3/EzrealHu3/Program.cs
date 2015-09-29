@@ -57,10 +57,10 @@ namespace EzrealHu3
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("lasthitQ", new CheckBox("Use Q on LastHit"));
-            SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q", 30, 0, 100));
+            SettingsMenu.Add("lasthitMana", new Slider("Mana % To Use Q LastHit", 30, 0, 100));
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
-            SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q", 30, 0, 100));
+            SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q LaneClear", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("ksQ", new CheckBox("Use Q KillSteal"));
             SettingsMenu.Add("ksW", new CheckBox("Use W KillSteal"));

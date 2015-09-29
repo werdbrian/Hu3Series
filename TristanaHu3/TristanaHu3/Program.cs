@@ -35,9 +35,12 @@ namespace TristanaHu3
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
             if (Player.Instance.ChampionName != "Tristana")
-                return;
-            
+                return;            
+           
+            Q = new Spell.Active(SpellSlot.Q, 550 );
             W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, 250, Int32.MaxValue, 80);
+            E = new Spell.Targeted(SpellSlot.E, 550);
+            R = new Spell.Targeted(SpellSlot.R, 550);
 
             Menu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
             Menu.AddGroupLabel("Tristana Hu3 V0.4");

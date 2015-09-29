@@ -37,14 +37,14 @@ namespace ThreshHu3
             if (Player.Instance.ChampionName != "Thresh")
                 return;
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1080, SkillShotType.Linear, (int)0.35f, 1200, 60);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1080, SkillShotType.Linear, 350, Int32.MaxValue, 60);
             Q2 = new Spell.Active(SpellSlot.Q, 1300);
-            W = new Spell.Skillshot(SpellSlot.W, 950, SkillShotType.Circular, (int)0.25f, 1750, 300);
-            E = new Spell.Skillshot(SpellSlot.E, 500, SkillShotType.Linear, 1, 2000, 110);
+            W = new Spell.Skillshot(SpellSlot.W, 950, SkillShotType.Circular, 250, Int32.MaxValue, 300);
+            E = new Spell.Skillshot(SpellSlot.E, 500, SkillShotType.Linear, 1, Int32.MaxValue, 110);
             R = new Spell.Active(SpellSlot.R, 350);
 
             ThreshMenu = MainMenu.AddMenu("Thresh Hu3", "threshhu3");
-            ThreshMenu.AddGroupLabel("Thresh Hu3 0.3");
+            ThreshMenu.AddGroupLabel("Thresh Hu3 0.4");
             ThreshMenu.AddSeparator();
             ThreshMenu.AddLabel("Made By MarioGK");
             SettingsMenu = ThreshMenu.AddSubMenu("Settings", "Settings");
@@ -172,21 +172,26 @@ namespace ThreshHu3
         {
             if (_Player.IsDead) return;
 
-            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            var drawQ = SettingsMenu["Qd"].Cast<CheckBox>().CurrentValue;
+            var drawW = SettingsMenu["Wd"].Cast<CheckBox>().CurrentValue;
+            var drawE = SettingsMenu["Ed"].Cast<CheckBox>().CurrentValue;
+            var drawR = SettingsMenu["Rd"].Cast<CheckBox>().CurrentValue;
+
+            if (drawQ)
             {
                 new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            if (drawW)
             {
-                new Circle() { Color = Color.White, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.BlueViolet, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawE"].Cast<CheckBox>().CurrentValue)
+            if (drawE)
             {
-                new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Black, BorderWidth = 1, Radius = E.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawR"].Cast<CheckBox>().CurrentValue)
+            if (drawR)
             {
-                new Circle() { Color = Color.Purple, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Pink, BorderWidth = 1, Radius = R.Range }.Draw(_Player.Position);
             }
         }
     }

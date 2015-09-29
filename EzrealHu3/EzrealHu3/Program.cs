@@ -204,7 +204,7 @@ namespace EzrealHu3
             }
             if (drawW)
             {
-                new Circle() { Color = Color.Black, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
+                new Circle() { Color = Color.Black, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
             }
             if (drawR)
             {

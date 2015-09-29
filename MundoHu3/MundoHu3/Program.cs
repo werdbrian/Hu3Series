@@ -48,7 +48,7 @@ namespace MundoHu3
             R = new Spell.Active(SpellSlot.R);
 
             EzrealMenu = MainMenu.AddMenu("Mundo Hu3", "mundohu3");
-            EzrealMenu.AddGroupLabel("Mundo Hu3 0.3");
+            EzrealMenu.AddGroupLabel("Mundo Hu3 V0.4");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -121,10 +121,9 @@ namespace MundoHu3
         {
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var usingW = Player.HasBuff("BurningAgony");
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
             if (useW && usingW)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
                     if (!target.IsValidTarget(W.Range) && Wing == true)
                     {
                         W.Cast();
@@ -132,42 +131,28 @@ namespace MundoHu3
                     }
                 }
             }
-        }
 
         private static void Combo()
         {
             var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["comboR"].Cast<CheckBox>().CurrentValue;
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
 
-            if(useQ && Q.IsReady())
+            if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        Q.Cast(target);
-                    }
-                }
+                Q.Cast(target);
             }
-            if (useW && W.IsReady())
+
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && Wing == false)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Wing == false)
-                    {
-                        W.Cast();
-                        Wing = true;
-                    }
-                }
+                W.Cast();
+                Wing = true;
             }
-            if (useE && E.IsReady())
+
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
-                {
-                   E.Cast(target);
-                }
+                E.Cast();
             }
         }
 
@@ -177,33 +162,22 @@ namespace MundoHu3
             var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady())
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
+
+            if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Q.GetPrediction(target).HitChance >= HitChance.High)
-                    {
-                        Q.Cast(target);
-                    }
-                }
+                Q.Cast(target);
             }
-            if (useW && W.IsReady())
+
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && Wing == false)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(W.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    if (Wing == false)
-                    {
-                        W.Cast();
-                        Wing = true;
-                    }
-                }
+                W.Cast();
+                Wing = true;
             }
-            if (useE && E.IsReady())
+
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsDead && !target.IsZombie)
             {
-                foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(E.Range) && !o.IsDead && !o.IsZombie))
-                {
-                    E.Cast(target);
-                }
+                E.Cast();
             }
         }
         private static void LastHit()

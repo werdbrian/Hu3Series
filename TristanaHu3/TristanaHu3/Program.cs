@@ -40,7 +40,7 @@ namespace TristanaHu3
             W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, 250, Int32.MaxValue, 80);
 
             Menu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            Menu.AddGroupLabel("Tristana Hu3 V0.3");
+            Menu.AddGroupLabel("Tristana Hu3 V0.4");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
@@ -71,7 +71,7 @@ namespace TristanaHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
-            if (_Player.IsDead || MenuGUI.IsChatOpen) return;
+            if (_Player.IsDead || MenuGUI.IsChatOpen || _Player.IsRecalling) return;
 
             GetRange();
 

@@ -48,7 +48,7 @@ namespace MundoHu3
             R = new Spell.Active(SpellSlot.R);
 
             EzrealMenu = MainMenu.AddMenu("Mundo Hu3", "mundohu3");
-            EzrealMenu.AddGroupLabel("Mundo Hu3 0.2");
+            EzrealMenu.AddGroupLabel("Mundo Hu3 0.3");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -62,6 +62,10 @@ namespace MundoHu3
             SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
             SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
             SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
+            SettingsMenu.AddLabel("LastHit");
+            SettingsMenu.Add("Qlh", new CheckBox("Use Q on Last Hit"));
+            SettingsMenu.AddLabel("LaneClear");
+            SettingsMenu.Add("Qlc", new CheckBox("Use Q on Lane Clear"));
             SettingsMenu.AddLabel("Auto Ult");
             SettingsMenu.Add("autoR", new CheckBox("Use R"));
             SettingsMenu.Add("healthAutoR", new Slider("Min Health To Ult", 10, 0, 100));
@@ -77,6 +81,8 @@ namespace MundoHu3
 
         private static void Game_OnTick(EventArgs args)
         {
+            if (_Player.IsDead || MenuGUI.IsChatOpen || _Player.IsRecalling) return;
+
             AutoUlt();
 
             CheckW();
@@ -88,7 +94,16 @@ namespace MundoHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
-            }          
+            }
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
+            {
+                LaneClear();
+            }
+
+            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LastHit)
+            {
+                LastHit();
+            }
         }
 
         private static void AutoUlt()
@@ -110,7 +125,7 @@ namespace MundoHu3
             {
                 foreach (var target in HeroManager.Enemies.Where(o => o.IsValidTarget(Q.Range) && !o.IsDead && !o.IsZombie))
                 {
-                    if (!target.IsValidTarget(W.Range))
+                    if (!target.IsValidTarget(W.Range) && Wing == true)
                     {
                         W.Cast();
                         Wing = false;
@@ -190,6 +205,33 @@ namespace MundoHu3
                     E.Cast(target);
                 }
             }
+        }
+        private static void LastHit()
+        {
+            var useQ = SettingsMenu["Qlh"].Cast<CheckBox>().CurrentValue;
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+            {
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange) && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.Q))
+                {
+                    Q.Cast(minion);
+                }
+            }
+
+        }
+
+        private static void LaneClear()
+        {
+            var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
+            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            foreach (var minion in minions)
+            {
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange) && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.Q))
+                {
+                    Q.Cast(minion);
+                }
+            }
+
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

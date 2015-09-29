@@ -46,7 +46,7 @@ namespace KayleHu3
 
 
             Menu = MainMenu.AddMenu("Kayle Hu3", "kaylehu3");
-            Menu.AddGroupLabel("Kayle Hu3 1.0");
+            Menu.AddGroupLabel("Kayle Hu3 V1.0");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
 
@@ -74,7 +74,7 @@ namespace KayleHu3
             SettingsMenu.Add("HPme", new Slider("Health % To Use R", 20, 0, 100));
             SettingsMenu.Add("Rally", new CheckBox("Use R in Ally"));          
             SettingsMenu.Add("HPally", new Slider("Health % To Use R on Ally", 20, 0, 100));
-            SettingsMenu.Add("Rdangerous", new CheckBox("Use R on dagenrous spells ? (Only R Zed)"));     
+            SettingsMenu.Add("Rdangerous", new CheckBox("Use R on dangerous spells ? (Only R Zed)"));     
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("Qdraw", new CheckBox("Draw Q"));
             SettingsMenu.Add("Wdraw", new CheckBox("Draw Q"));
@@ -142,14 +142,14 @@ namespace KayleHu3
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsZombie)
             {
                 Q.Cast(target);
+            }   
+            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsZombie)
+            {
+                E.Cast();
             }
             if (useW && W.IsReady() && target.IsValidTarget(E.Range) && !target.IsZombie && _Player.HealthPercent < 95)
             {
                 W.Cast(_Player);
-            }
-            if (useE && E.IsReady() && target.IsValidTarget(E.Range) && !target.IsZombie)
-            {
-                E.Cast();
             }
         }
 

@@ -173,7 +173,7 @@ namespace MasterYiHu3
             if (_Player.IsDead)
                 return;
 
-            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (SettingsMenu["Qdraw"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
                 new Circle() { Color = Color.Green, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }

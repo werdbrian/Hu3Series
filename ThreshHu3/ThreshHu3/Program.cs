@@ -60,10 +60,10 @@ namespace ThreshHu3
             SettingsMenu.Add("Q2h", new CheckBox("Use Q Follow on Harass"));
             SettingsMenu.Add("Eh", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("Draw");
-            SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
-            SettingsMenu.Add("drawW", new CheckBox("Draw W"));
-            SettingsMenu.Add("drawE", new CheckBox("Draw E"));
-            SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
+            SettingsMenu.Add("Qd", new CheckBox("Draw Q"));
+            SettingsMenu.Add("Wd", new CheckBox("Draw W"));
+            SettingsMenu.Add("Ed", new CheckBox("Draw E"));
+            SettingsMenu.Add("Rd", new CheckBox("Draw R Combo"));
             SettingsMenu.AddLabel("Misc");
             SettingsMenu.Add("gapE", new CheckBox("Anti GapCloser E"));
 

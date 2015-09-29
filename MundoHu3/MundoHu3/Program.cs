@@ -21,7 +21,7 @@ namespace MundoHu3
         public static Spell.Active W;
         public static Spell.Active E;
         public static Spell.Active R;
-        public static Menu EzrealMenu, SettingsMenu;
+        public static Menu Menu, SettingsMenu;
         public static bool Wing = false;
 
 
@@ -42,17 +42,17 @@ namespace MundoHu3
                 return;
 
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 970, SkillShotType.Linear, 250, 2000, 60);
+            Q = new Spell.Skillshot(SpellSlot.Q, 970, SkillShotType.Linear, 250, Int32.MaxValue, 60);
             W = new Spell.Active(SpellSlot.W, 160);
             E = new Spell.Active(SpellSlot.E, 125);
             R = new Spell.Active(SpellSlot.R);
 
-            EzrealMenu = MainMenu.AddMenu("Mundo Hu3", "mundohu3");
-            EzrealMenu.AddGroupLabel("Mundo Hu3 V0.4");
-            EzrealMenu.AddSeparator();
-            EzrealMenu.AddLabel("Made By MarioGK");
+            Menu = MainMenu.AddMenu("Mundo Hu3", "mundohu3");
+            Menu.AddGroupLabel("Mundo Hu3 V0.4");
+            Menu.AddSeparator();
+            Menu.AddLabel("Made By MarioGK");
 
-            SettingsMenu = EzrealMenu.AddSubMenu("Settings", "Settings");
+            SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
             SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
@@ -122,7 +122,8 @@ namespace MundoHu3
             var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
             var usingW = Player.HasBuff("BurningAgony");
             var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
-            if (useW && usingW)
+
+            if (useW && Wing && usingW)
             {
                     if (!target.IsValidTarget(W.Range) && Wing == true)
                     {

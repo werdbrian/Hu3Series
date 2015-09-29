@@ -76,22 +76,43 @@ namespace TristanaHu3
         {
             if (_Player.IsDead || MenuGUI.IsChatOpen || _Player.IsRecalling) return;
 
-            GetRange();
-
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
+                ForceETarget();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
                 Harass();
+                ForceETarget();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
                 LaneClear();
+                ForceETarget();
             }
-            
+
+            GetRange();
+
             KillSteal();
+        }
+        private static void ForceETarget()
+        {
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+
+            if (target.HasBuff("tristaneecharge"))
+            {
+                Orbwalker.ForcedTarget = target;
+            }
+
+            foreach ( var minion in minions)
+            {
+                if (minion.HasBuff("tristaneecharge"))
+                {
+                    Orbwalker.ForcedTarget = minion;
+                }
+            }
         }
         private static void GetRange()
         {
@@ -102,7 +123,7 @@ namespace TristanaHu3
         }
         private static void Combo()
         {
-            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
             var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
 
@@ -119,7 +140,7 @@ namespace TristanaHu3
 
         private static void KillSteal()
         {
-            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
+            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
             var useW = SettingsMenu["Wkill"].Cast<CheckBox>().CurrentValue;
             var useR = SettingsMenu["Rkill"].Cast<CheckBox>().CurrentValue;
             var useER = SettingsMenu["ERkill"].Cast<CheckBox>().CurrentValue;
@@ -176,7 +197,6 @@ namespace TristanaHu3
         private static void LaneClear()
         {
             var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
-            var eminion = ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && !m.IsDead && m.HasBuff("tristanaecharge"));
             var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
             var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Elc"].Cast<CheckBox>().CurrentValue;

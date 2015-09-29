@@ -28,6 +28,7 @@ namespace MundoHu3
         static void Main(string[] args)
         {
             Loading.OnLoadingComplete += Loading_OnLoadingComplete;
+            Bootstrap.Init(null);
         }
 
         public static AIHeroClient _Player
@@ -40,10 +41,8 @@ namespace MundoHu3
             if (Player.Instance.ChampionName != "DrMundo")
                 return;
 
-            TargetSelector.Init();
-            Bootstrap.Init(null);
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 970, SkillShotType.Linear, (int)0.25f, 2000, (int)60f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 970, SkillShotType.Linear, 250, 2000, 60);
             W = new Spell.Active(SpellSlot.W, 160);
             E = new Spell.Active(SpellSlot.E, 125);
             R = new Spell.Active(SpellSlot.R);

@@ -32,7 +32,7 @@ namespace KayleHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Ezreal")
+            if (Player.Instance.ChampionName != "Kayle")
                 return;
 
             Q = new Spell.Targeted(SpellSlot.Q, 650);
@@ -66,9 +66,9 @@ namespace KayleHu3
             SettingsMenu.Add("Qks", new CheckBox("Use Q KillSteal"));
             SettingsMenu.AddLabel("Ult Manager");
             SettingsMenu.Add("Rme", new CheckBox("Use R in Yourself"));
-            SettingsMenu.Add("hpMe", new Slider("Health % To Use R", 20, 0, 100));
+            SettingsMenu.Add("HPme", new Slider("Health % To Use R", 20, 0, 100));
             SettingsMenu.Add("Rally", new CheckBox("Use R in Ally"));          
-            SettingsMenu.Add("hpAlly", new Slider("Health % To Use R on Ally", 20, 0, 100));
+            SettingsMenu.Add("HPally", new Slider("Health % To Use R on Ally", 20, 0, 100));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("Qd", new CheckBox("Draw Q"));
             SettingsMenu.Add("Wd", new CheckBox("Draw Q"));
@@ -82,6 +82,8 @@ namespace KayleHu3
 
         private static void Game_OnTick(EventArgs args)
         {
+            KillSteal();
+
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -97,47 +99,27 @@ namespace KayleHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
             {
                 LaneClear();
-            }
-            KillSteal();
+            }           
         }
 
-        //Damages
-        public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
-        {
-            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
-            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
-            if (spell == SpellSlot.Q)
-            {
-                if (!Q.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 60f + 50f * (Q.Level - 1) + 60 / 100 * ap + 100 / 100 * ad);
-            }
-            else if (spell == SpellSlot.E)
-            {
-                if (!E.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Mixed, ad + 10f + 5f * (E.Level - 1) + 15 / 100 * ap);
-            }
-
-            return 0;
-        }
         private static void KillSteal()
         {
             var useQ = SettingsMenu["Qks"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Mixed);
 
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetDamage(SpellSlot.Q, target))
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && target.Health <= Player.Instance.GetSpellDamage(target ,SpellSlot.Q))
             {
                 Q.Cast(target);
             }
 
         }
+
         private static void Combo()
         {
             var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
             var useW = SettingsMenu["Wc"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
-            var target = TargetSelector.GetTarget(R.Range, DamageType.Mixed);
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Mixed);
 
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
@@ -157,7 +139,7 @@ namespace KayleHu3
         {
             var useQ = SettingsMenu["Qh"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Eh"].Cast<CheckBox>().CurrentValue;
-            var target = TargetSelector.GetTarget(R.Range, DamageType.Mixed);
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Mixed);
 
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie)
             {
@@ -176,7 +158,7 @@ namespace KayleHu3
             var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
             {
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     Q.Cast(minion);
                 }
@@ -194,11 +176,11 @@ namespace KayleHu3
             var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
             foreach (var minion in minions)
             {
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     Q.Cast(minion);
                 }
-                if (useE && E.IsReady() && minion.IsValidTarget(650) && minion.Health <= GetDamage(SpellSlot.E, minion))
+                if (useE && E.IsReady() && minion.IsValidTarget(650) && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.E))
                 {
                     E.Cast();
                 }
@@ -207,6 +189,23 @@ namespace KayleHu3
 
         private static void AutoUlt()
         {
+            var Rme = SettingsMenu["Rme"].Cast<CheckBox>().CurrentValue;
+            var Rally = SettingsMenu["Rally"].Cast<CheckBox>().CurrentValue;
+            var HPme = SettingsMenu["HPme"].Cast<Slider>().CurrentValue;
+            var HPally = SettingsMenu["HPally"].Cast<Slider>().CurrentValue;
+            var allies = HeroManager.Allies.OrderBy(a => a.Health).Where(a => !a.IsDead && !a.IsZombie);
+
+            if (Rme && R.IsReady() && Player.Instance.HealthPercent < HPme && R.IsReady() && Player.Instance.CountEnemiesInRange(R.Range) >= 1)
+            {
+                R.Cast(_Player);
+            }
+            foreach (var ally in allies)
+            {
+                if (Rally && R.IsReady() && ally.Health < HPally && R.IsReady() && ally.CountEnemiesInRange(R.Range) >= 1)
+                {
+                    R.Cast(ally);
+                }
+            }
         }
         private static void Drawing_OnDraw(EventArgs args)
         {

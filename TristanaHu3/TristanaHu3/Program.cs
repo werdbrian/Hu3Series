@@ -41,12 +41,12 @@ namespace TristanaHu3
             
             uint level = (uint)Player.Instance.Level;
             Q = new Spell.Active(SpellSlot.Q, 543 + level * 7);
-            W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, (int)0.25f, Int32.MaxValue, (int)80f);
+            W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, 250, Int32.MaxValue, 80);
             E = new Spell.Targeted(SpellSlot.E, 543 + level * 7);
             R = new Spell.Targeted(SpellSlot.R, 543 + level * 7);
 
             Menu = MainMenu.AddMenu("TristanaHu3", "tristanahu3");
-            Menu.AddGroupLabel("Tristana Hu3 0.1");
+            Menu.AddGroupLabel("Tristana Hu3 V0.3");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
@@ -108,37 +108,7 @@ namespace TristanaHu3
             }
             
         }
-        public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
-        {
-            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
-            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
-            if (spell == SpellSlot.Q)
-            {
-                if (!Q.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 0f + 0f * (Q.Level - 1) + 0 / 100 * ap);
-            }
-            else if (spell == SpellSlot.W)
-            {
-                if (!W.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 80f + 25f * (W.Level - 1) + 50 / 100 * ap);
-            }
-            else if (spell == SpellSlot.E)
-            {
-                if (!E.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 110f + 35f * (E.Level - 1) + 50 / 100 + 15 /100 * (E.Level - 1) + 75 / 100 * ap);
-            }
-            else if (spell == SpellSlot.R)
-            {
-                if (!R.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 300f + 100f * (R.Level - 1) + 100 / 100 * ap);
-            }
 
-            return 0;
-        }
         private static void KillSteal()
         {
             var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Magical);
@@ -146,15 +116,16 @@ namespace TristanaHu3
             var useR = SettingsMenu["Rkill"].Cast<CheckBox>().CurrentValue;
             var useER = SettingsMenu["ERkill"].Cast<CheckBox>().CurrentValue;
 
-            if (R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetDamage(SpellSlot.Q, target))
+            if (R.IsReady() && useR && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= Player.Instance.GetSpellDamage(target, SpellSlot.R))
             {
                 R.Cast(target);
             }
-            if (W.IsReady() && useW && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetDamage(SpellSlot.W, target))
+            if (W.IsReady() && useW && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && target.Health <= Player.Instance.GetSpellDamage(target, SpellSlot.R))
             {
                 W.Cast(target);
             }
-            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetEdmg(target) + GetDamage(SpellSlot.R, target))
+            if (useER && W.IsReady() && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && target.Health <= GetEdmg(target) 
+                + Player.Instance.GetSpellDamage(target, SpellSlot.R))
             {              
                 R.Cast(target);
             }
@@ -171,7 +142,7 @@ namespace TristanaHu3
             float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
             if (target.GetBuffCount("TristanaECharge") != 0)
             {
-                return (GetDamage(SpellSlot.E, target) * ((0.3 * target.GetBuffCount("TristanaECharge") + 1))
+                return (Player.Instance.GetSpellDamage(target, SpellSlot.E) * ((0.3 * target.GetBuffCount("TristanaECharge") + 1))
                         + (ad) + (ap * 0.5));
             }
 
@@ -196,21 +167,26 @@ namespace TristanaHu3
         }
         private static void LaneClear()
         {
-            var minion = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var eminion = ObjectManager.Get<Obj_AI_Minion>().Where(m => m.IsEnemy && !m.IsDead && m.HasBuff("tristanaecharge"));
             var tower = ObjectManager.Get<Obj_AI_Turret>().FirstOrDefault(a => a.IsEnemy && !a.IsDead && a.Distance(_Player) < _Player.AttackRange);
             var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Elc"].Cast<CheckBox>().CurrentValue;
             var useETower = SettingsMenu["Etower"].Cast<CheckBox>().CurrentValue;
             var mana = SettingsMenu["laneclearMana"].Cast<Slider>().CurrentValue;
-            if (useE && E.IsReady() && Player.Instance.ManaPercent > mana)
+            foreach (var minion in minions)
             {
-                E.Cast(minion);
-            }
-            if (useQ && Q.IsReady() && Player.Instance.ManaPercent > mana)
-            {
-                Q.Cast();
-            }
-            if (useETower && E.IsReady() && minion == null && Player.Instance.ManaPercent > mana)
+                if (useE && E.IsReady() && Player.Instance.ManaPercent > mana)
+                {
+                    E.Cast(minion);
+                    
+                }
+                if (useQ && Q.IsReady() && minion.HasBuff("tristanaecharge"))
+                {
+                    Q.Cast();
+                }
+            }          
+            if (useETower && E.IsReady() && minions == null && Player.Instance.ManaPercent > mana)
             {
                 E.Cast(tower);
                 Q.Cast();

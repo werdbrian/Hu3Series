@@ -76,6 +76,11 @@ namespace EzrealHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
+            if (_Player.IsDead || MenuGUI.IsChatOpen) return;
+
+            GetRange();
+
+            KillSteal();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -91,42 +96,12 @@ namespace EzrealHu3
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.LaneClear)
             {
                 LaneClear();
-            }
-                KillSteal();
+            }          
         }
-        //Damages
-        public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
+        private static void GetRange()
         {
-            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
-            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
-            if (spell == SpellSlot.Q)
-            {
-                if (!Q.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 35f + 20f * (Q.Level - 1) + 40 / 100 * ap + 110 / 100 * ad);
-            }
-            else if (spell == SpellSlot.W)
-            {
-                if (!W.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 70f + 45f * (W.Level - 1) + 80 / 100 * ap);
-            }
-            else if (spell == SpellSlot.E)
-            {
-                if (!E.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 110f + 35f * (E.Level - 1) + 75 / 100 * ap);
-            }
-            else if (spell == SpellSlot.R)
-            {
-                if (!R.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 350f + 150f * (R.Level - 1) + 90 / 100 * ap + 100 / 100 * ad);
-            }
 
-            return 0;
         }
-
         private static void KillSteal()
         {
             var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
@@ -135,17 +110,17 @@ namespace EzrealHu3
             var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium
-                && target.Health <= GetDamage(SpellSlot.Q, target)) 
+                && target.Health <= Player.Instance.GetSpellDamage(target, SpellSlot.Q)) 
             {
                 Q.Cast(target);
             }
             if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsDead && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.Medium
-                && target.Health <= GetDamage(SpellSlot.W, target))
+                && target.Health <= Player.Instance.GetSpellDamage(target, SpellSlot.W))
             {
                 W.Cast(target);
             }
             if (useR && R.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && R.GetPrediction(target).HitChance >= HitChance.High
-                && target.Health <= GetDamage(SpellSlot.R, target))
+                && target.Health <= Player.Instance.GetSpellDamage(target, SpellSlot.R))
             {
                 R.Cast(target);
             }
@@ -169,7 +144,7 @@ namespace EzrealHu3
                 W.Cast(target);
             }
             if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsDead && !target.IsZombie && R.GetPrediction(target).HitChance >= HitChance.High
-                && target.Health <= GetDamage(SpellSlot.R, target))
+                && target.Health <= Player.Instance.GetSpellDamage(target, SpellSlot.R))
             {
                 R.Cast(target);
             }
@@ -200,7 +175,7 @@ namespace EzrealHu3
             foreach (var minion in minions)
             {
                 if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange) 
-                    && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                    && Player.Instance.ManaPercent > mana && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     Q.Cast(minion);
                 }
@@ -215,7 +190,7 @@ namespace EzrealHu3
             foreach (var minion in minions)
             {
                 if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && !minion.IsValidTarget(_Player.AttackRange)
-                    && Player.Instance.ManaPercent > mana && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                    && Player.Instance.ManaPercent > mana && minion.Health <= Player.Instance.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     Q.Cast(minion);
                 }

@@ -80,17 +80,17 @@ namespace TristanaHu3
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
-                ForceETarget();
+                //ForceETarget();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
                 Harass();
-                ForceETarget();
+                //ForceETarget();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
                 LaneClear();
-                ForceETarget();
+                //ForceETarget();
             }
 
             KillSteal();

@@ -35,7 +35,7 @@ namespace MasterYiHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "MasterYi")
+            if (_Player.ChampionName != "MasterYi")
                 return;
 
             Q = new Spell.Targeted(SpellSlot.Q, 600);
@@ -44,23 +44,25 @@ namespace MasterYiHu3
             R = new Spell.Active(SpellSlot.R, 500);
 
             Menu = MainMenu.AddMenu("MasterYiHu3", "masteryihu3");
-            Menu.AddGroupLabel("MasterYi Hu3 Test Version 0.2");
+            Menu.AddGroupLabel("MasterYi Hu3 V1.0");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
-            SettingsMenu.Add("Qc", new CheckBox("Use Q on Combo"));
-            SettingsMenu.Add("Ec", new CheckBox("Use E on Combo"));
-            SettingsMenu.Add("Rc", new CheckBox("Use R on Combo"));
+            SettingsMenu.Add("Qcombo", new CheckBox("Use Q on Combo"));
+            SettingsMenu.Add("Ecombo", new CheckBox("Use E on Combo"));
+            SettingsMenu.Add("Rcombo", new CheckBox("Use R on Combo"));
             SettingsMenu.AddLabel("Harass");
-            SettingsMenu.Add("Qh", new CheckBox("Use Q on Harass"));
+            SettingsMenu.Add("Qharass", new CheckBox("Use Q on Harass"));
             SettingsMenu.AddLabel("LaneClear");
-            SettingsMenu.Add("Qlc", new CheckBox("Use Q on LaneClear"));
+            SettingsMenu.Add("Qlane", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.AddLabel("LastHit");
-            SettingsMenu.Add("Qlh", new CheckBox("Use Q on LastHit"));
+            SettingsMenu.Add("Qlast", new CheckBox("Use Q on LastHit"));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("Qkill", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.Add("Qks", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.AddLabel("Evade With Q/W (WIP)");
+            SettingsMenu.Add("evade", new CheckBox("Use Evade Q/W (WIP)"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("Qdraw", new CheckBox("Draw Q"));
 
@@ -69,6 +71,9 @@ namespace MasterYiHu3
         }
         private static void Game_OnTick(EventArgs args)
         {
+
+            if (_Player.IsDead || MenuGUI.IsChatOpen || _Player.IsRecalling) return;
+
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
@@ -84,24 +89,16 @@ namespace MasterYiHu3
 
             KillSteal();
         }
-        public static float GetDamage(SpellSlot spell, Obj_AI_Base target)
-        {
-            float ap = _Player.FlatMagicDamageMod + _Player.BaseAbilityDamage;
-            float ad = _Player.FlatMagicDamageMod + _Player.BaseAttackDamage;
-            if (spell == SpellSlot.Q)
-            {
-                if (!Q.IsReady())
-                    return 0;
-                return _Player.CalculateDamageOnUnit(target, DamageType.Magical, 25f + 35f * (Q.Level - 1) + 100 / 100 * ad);
-            }
-            return 0;
-        }
 
         private static void KillSteal()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var useQ = SettingsMenu["Qkill"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && target.Health <= GetDamage(SpellSlot.Q, target))
+            var useQ = SettingsMenu["Qks"].Cast<CheckBox>().CurrentValue;
+
+            if (target == null)
+                return;
+
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && target.Health <= _Player.GetSpellDamage(target, SpellSlot.Q))
             {
                 Q.Cast(target);
             }
@@ -110,19 +107,22 @@ namespace MasterYiHu3
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["Ec"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["Rc"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["Qcombo"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Ecombo"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["Rcombo"].Cast<CheckBox>().CurrentValue;
 
-            if (useQ && Q.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(Q.Range))
+            if (target == null)
+                return;
+
+            if (useQ && Q.IsReady() && !target.IsZombie && target.IsValidTarget(Q.Range))
             {
                 Q.Cast(target);
             }
-            if (useE && E.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(150))
+            if (useE && E.IsReady() && !target.IsZombie && target.IsValidTarget(150))
             {
                 E.Cast();
             }
-            if (useR && R.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(R.Range))
+            if (useR && R.IsReady() && !target.IsZombie && target.IsValidTarget(R.Range))
             {
                 R.Cast();
             }
@@ -131,8 +131,8 @@ namespace MasterYiHu3
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            var useQ = SettingsMenu["Qc"].Cast<CheckBox>().CurrentValue;
-            if (useQ && Q.IsReady() && !target.IsDead && !target.IsZombie && target.IsValidTarget(Q.Range))
+            var useQ = SettingsMenu["Qharass"].Cast<CheckBox>().CurrentValue;
+            if (useQ && Q.IsReady() && !target.IsZombie && target.IsValidTarget(Q.Range))
             {
                 Q.Cast(target);
             }
@@ -140,10 +140,14 @@ namespace MasterYiHu3
 
         private static void LaneClear()
         {
-            var useQ = SettingsMenu["Qlc"].Cast<CheckBox>().CurrentValue;
-            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var useQ = SettingsMenu["Qlane"].Cast<CheckBox>().CurrentValue;
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsEnemy);
+
+            if (minions == null)
+                return;
+
             foreach (var minion in minions)
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= _Player.GetSpellDamage(minion, SpellSlot.Q))
             {
                 Q.Cast(minion);
             }
@@ -151,10 +155,14 @@ namespace MasterYiHu3
 
         private static void LastHit()
         {
-            var useQ = SettingsMenu["Qlh"].Cast<CheckBox>().CurrentValue;
-            var minions = ObjectManager.Get<Obj_AI_Base>().OrderBy(m => m.Health).Where(m => m.IsMinion && m.IsEnemy && !m.IsDead);
+            var useQ = SettingsMenu["Qlast"].Cast<CheckBox>().CurrentValue;
+            var minions = ObjectManager.Get<Obj_AI_Minion>().OrderBy(m => m.Health).Where(m => m.IsEnemy);
+
+            if (minions == null)
+                return;
+
             foreach (var minion in minions)
-                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= GetDamage(SpellSlot.Q, minion))
+                if (useQ && Q.IsReady() && minion.IsValidTarget(Q.Range) && minion.Health <= _Player.GetSpellDamage(minion, SpellSlot.Q))
                 {
                     Q.Cast(minion);
                 }
@@ -162,7 +170,10 @@ namespace MasterYiHu3
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            if (_Player.IsDead)
+                return;
+
+            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
                 new Circle() { Color = Color.Green, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }

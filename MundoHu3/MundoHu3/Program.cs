@@ -38,7 +38,7 @@ namespace MundoHu3
 
         private static void Loading_OnLoadingComplete(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "DrMundo")
+            if (_Player.ChampionName != "DrMundo")
                 return;
 
 
@@ -48,20 +48,20 @@ namespace MundoHu3
             R = new Spell.Active(SpellSlot.R);
 
             Menu = MainMenu.AddMenu("Mundo Hu3", "mundohu3");
-            Menu.AddGroupLabel("Mundo Hu3 V0.6");
+            Menu.AddGroupLabel("Mundo Hu3 V1.0");
             Menu.AddSeparator();
             Menu.AddLabel("Made By MarioGK");
 
             SettingsMenu = Menu.AddSubMenu("Settings", "Settings");
             SettingsMenu.AddGroupLabel("Settings");
             SettingsMenu.AddLabel("Combo");
-            SettingsMenu.Add("comboQ", new CheckBox("Use Q on Combo"));
-            SettingsMenu.Add("comboW", new CheckBox("Use W on Combo"));
-            SettingsMenu.Add("comboE", new CheckBox("Use E on Combo"));
+            SettingsMenu.Add("Qcombo", new CheckBox("Use Q on Combo"));
+            SettingsMenu.Add("Wcombo", new CheckBox("Use W on Combo"));
+            SettingsMenu.Add("Ecombo", new CheckBox("Use E on Combo"));
             SettingsMenu.AddLabel("Harass");
-            SettingsMenu.Add("harassQ", new CheckBox("Use Q on Harass"));
-            SettingsMenu.Add("harassW", new CheckBox("Use W on Harass"));
-            SettingsMenu.Add("harassE", new CheckBox("Use E on Harass"));
+            SettingsMenu.Add("Qharass", new CheckBox("Use Q on Harass"));
+            SettingsMenu.Add("Wharass", new CheckBox("Use W on Harass"));
+            SettingsMenu.Add("Eharass", new CheckBox("Use E on Harass"));
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("Qlast", new CheckBox("Use Q on Last Hit"));
             SettingsMenu.AddLabel("LaneClear");
@@ -70,8 +70,8 @@ namespace MundoHu3
             SettingsMenu.Add("autoR", new CheckBox("Use R"));
             SettingsMenu.Add("healthAutoR", new Slider("Min Health To Ult", 10, 0, 100));
             SettingsMenu.AddLabel("Draw");
-            SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
-            SettingsMenu.Add("drawW", new CheckBox("Draw W"));
+            SettingsMenu.Add("Qdraw", new CheckBox("Draw Q"));
+            SettingsMenu.Add("Wdraw", new CheckBox("Draw W"));
 
 
             Game.OnTick += Game_OnTick;
@@ -110,7 +110,7 @@ namespace MundoHu3
         {
             var autoR = SettingsMenu["autoR"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = SettingsMenu["healthAutoR"].Cast<Slider>().CurrentValue;
-            if (autoR && Player.Instance.HealthPercent < healthAutoR)
+            if (autoR && _Player.HealthPercent < healthAutoR)
             {
                 R.Cast();
             }
@@ -144,9 +144,9 @@ namespace MundoHu3
 
         private static void Combo()
         {
-            var useQ = SettingsMenu["comboQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["comboW"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["comboE"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["Qcombo"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["Wcombo"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Ecombo"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
 
             if (target == null)
@@ -172,10 +172,13 @@ namespace MundoHu3
         private static void Harass()
         {
 
-            var useQ = SettingsMenu["harassQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["harassW"].Cast<CheckBox>().CurrentValue;
-            var useE = SettingsMenu["harassE"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["Qharass"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["Wharass"].Cast<CheckBox>().CurrentValue;
+            var useE = SettingsMenu["Eharass"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+
+            if (target == null)
+                return;
 
             if (useQ && Q.IsReady() && Q.GetPrediction(target).HitChance >= HitChance.High && target.IsValidTarget(Q.Range) && !target.IsZombie)
             {
@@ -232,11 +235,14 @@ namespace MundoHu3
         {
             if (_Player.IsDead) return;
 
-            if (SettingsMenu["drawQ"].Cast<CheckBox>().CurrentValue)
+            var drawQ = SettingsMenu["Qdraw"].Cast<CheckBox>().CurrentValue;
+            var drawW = SettingsMenu["Wdraw"].Cast<CheckBox>().CurrentValue;
+
+            if (drawQ && Q.IsReady())
             {
                 new Circle() { Color = Color.Red, BorderWidth = 1, Radius = Q.Range }.Draw(_Player.Position);
             }
-            if (SettingsMenu["drawW"].Cast<CheckBox>().CurrentValue)
+            if (drawW && W.IsReady())
             {
                 new Circle() { Color = Color.Blue, BorderWidth = 1, Radius = W.Range }.Draw(_Player.Position);
             }

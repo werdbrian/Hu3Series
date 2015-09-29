@@ -66,9 +66,9 @@ namespace EzrealHu3
             SettingsMenu.Add("ksW", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("ksR", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
-            SettingsMenu.Add("drawQ", new CheckBox("Draw Q"));
-            SettingsMenu.Add("drawW", new CheckBox("Draw W"));
-            SettingsMenu.Add("drawR", new CheckBox("Draw R Combo"));
+            SettingsMenu.Add("Qd", new CheckBox("Draw Q"));
+            SettingsMenu.Add("Wd", new CheckBox("Draw W"));
+            SettingsMenu.Add("Rd", new CheckBox("Draw R Combo"));
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;

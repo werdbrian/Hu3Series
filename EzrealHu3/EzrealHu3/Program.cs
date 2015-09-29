@@ -42,7 +42,7 @@ namespace EzrealHu3
             R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 1, Int32.MaxValue, 160);
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
-            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.4");
+            EzrealMenu.AddGroupLabel("Ezreal Hu3 3.5");
             EzrealMenu.AddSeparator();
             EzrealMenu.AddLabel("Made By MarioGK");
 
@@ -62,9 +62,9 @@ namespace EzrealHu3
             SettingsMenu.Add("laneclearQ", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("laneclearMana", new Slider("Mana % To Use Q LaneClear", 30, 0, 100));
             SettingsMenu.AddLabel("KillSteal");
-            SettingsMenu.Add("ksQ", new CheckBox("Use Q KillSteal"));
-            SettingsMenu.Add("ksW", new CheckBox("Use W KillSteal"));
-            SettingsMenu.Add("ksR", new CheckBox("Use R KillSteal"));
+            SettingsMenu.Add("Qks", new CheckBox("Use Q KillSteal"));
+            SettingsMenu.Add("Wks", new CheckBox("Use W KillSteal"));
+            SettingsMenu.Add("Rks", new CheckBox("Use R KillSteal"));
             SettingsMenu.AddLabel("Draw");
             SettingsMenu.Add("Qd", new CheckBox("Draw Q"));
             SettingsMenu.Add("Wd", new CheckBox("Draw W"));
@@ -98,9 +98,9 @@ namespace EzrealHu3
         }
         private static void KillSteal()
         {
-            var useQ = SettingsMenu["killstealQ"].Cast<CheckBox>().CurrentValue;
-            var useW = SettingsMenu["killstealW"].Cast<CheckBox>().CurrentValue;
-            var useR = SettingsMenu["killstealR"].Cast<CheckBox>().CurrentValue;
+            var useQ = SettingsMenu["Qks"].Cast<CheckBox>().CurrentValue;
+            var useW = SettingsMenu["Wks"].Cast<CheckBox>().CurrentValue;
+            var useR = SettingsMenu["Rks"].Cast<CheckBox>().CurrentValue;
             var target = TargetSelector.GetTarget(R.Range, DamageType.Physical);
 
             if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsDead && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium

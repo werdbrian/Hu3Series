@@ -145,14 +145,14 @@ namespace TristanaHu3
 
         private static void AIHeroClient_OnLevelUp(Obj_AI_Base sender, Obj_AI_BaseLevelUpEventArgs args)
         {
-            Q = new Spell.Active(SpellSlot.Q, (uint)_Player.GetAutoAttackRange());
-            E = new Spell.Targeted(SpellSlot.E, (uint)_Player.GetAutoAttackRange());
-            R = new Spell.Targeted(SpellSlot.R, (uint)_Player.GetAutoAttackRange());
+    //        Q = new Spell.Active(SpellSlot.Q, (uint)_Player.GetAutoAttackRange());
+        //    E = new Spell.Targeted(SpellSlot.E, (uint)_Player.GetAutoAttackRange());
+      //      R = new Spell.Targeted(SpellSlot.R, (uint)_Player.GetAutoAttackRange());
         }
             
         private static void Combo()
         {
-            var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
+            var target = TargetSelector.GetTarget(900, DamageType.Physical);
             var useQ = SettingsMenu["Qcombo"].Cast<CheckBox>().CurrentValue;
             var useE = SettingsMenu["Ecombo"].Cast<CheckBox>().CurrentValue;
 

@@ -8,7 +8,7 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using Color = System.Drawing.Color;
-
+using System.Collections.Generic;
 
 namespace EzrealHu3
 {
@@ -19,6 +19,8 @@ namespace EzrealHu3
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
         public static Menu EzrealMenu, SettingsMenu;
+
+        private static List<HitChance> HitChances { get; set; }
 
 
         static void Main(string[] args)
@@ -36,11 +38,23 @@ namespace EzrealHu3
             if (_Player.ChampionName != "Ezreal")
                 return;
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, 250, Int32.MaxValue, 60);
-            W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, 250, Int32.MaxValue, 80);
-            W.AllowedCollisionCount = int.MaxValue;
+            Q = new Spell.Skillshot(SpellSlot.Q, 1190, SkillShotType.Linear, 250, int.MaxValue, 60)
+            {
+                MinimumHitChance = HitChance.High
+            };
+
+            W = new Spell.Skillshot(SpellSlot.W, 990, SkillShotType.Linear, 250, int.MaxValue, 80)
+            {
+                MinimumHitChance = HitChance.High , AllowedCollisionCount = int.MaxValue
+            };
+
             E = new Spell.Targeted(SpellSlot.E, 700);
-            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 1, Int32.MaxValue, 160);
+
+            R = new Spell.Skillshot(SpellSlot.R, 2000, SkillShotType.Linear, 1, int.MaxValue, 160)
+            {
+                MinimumHitChance = HitChance.High
+            };
+
 
             EzrealMenu = MainMenu.AddMenu("Ezreal Hu3", "ezrealhu3");
             EzrealMenu.AddGroupLabel("Ezreal Hu3 1.0");
@@ -58,10 +72,10 @@ namespace EzrealHu3
             SettingsMenu.Add("Wharass", new CheckBox("Use W on Harass"));
             SettingsMenu.AddLabel("LastHit");
             SettingsMenu.Add("Qlast", new CheckBox("Use Q on LastHit"));
-            SettingsMenu.Add("lastMana", new Slider("Mana % To Use Q LastHit", 30, 0, 100));
+            SettingsMenu.Add("lastMana", new Slider("Mana % To Use Q LastHit", 30));
             SettingsMenu.AddLabel("LaneClear");
             SettingsMenu.Add("Qlane", new CheckBox("Use Q on LaneClear"));
-            SettingsMenu.Add("laneMana", new Slider("Mana % To Use Q LaneClear", 30, 0, 100));
+            SettingsMenu.Add("laneMana", new Slider("Mana % To Use Q LaneClear", 30));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("Qks", new CheckBox("Use Q KillSteal"));
             SettingsMenu.Add("Wks", new CheckBox("Use W KillSteal"));
@@ -70,6 +84,9 @@ namespace EzrealHu3
             SettingsMenu.Add("Qdraw", new CheckBox("Draw Q"));
             SettingsMenu.Add("Wdraw", new CheckBox("Draw W"));
             SettingsMenu.Add("Rdraw", new CheckBox("Draw R Combo"));
+
+            Game.OnTick += Game_OnTick;
+            Drawing.OnDraw += Drawing_OnDraw;
 
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -135,16 +152,15 @@ namespace EzrealHu3
             if (target == null)
                 return;         
 
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.High)
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsZombie)
             {
                 Q.Cast(target);
             }
-            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.High)
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsZombie)
             {
                 W.Cast(target);
             }
-            if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsZombie && R.GetPrediction(target).HitChance >= HitChance.High
-                && target.Health <= _Player.GetSpellDamage(target, SpellSlot.R))
+            if (useR && R.IsReady() && target.IsValidTarget(R.Range) && !target.IsZombie && target.Health <= _Player.GetSpellDamage(target, SpellSlot.R))
             {
                 R.Cast(target);
             }
@@ -160,11 +176,11 @@ namespace EzrealHu3
             if (target == null)
                 return;
 
-            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsZombie && Q.GetPrediction(target).HitChance >= HitChance.Medium)
+            if (useQ && Q.IsReady() && target.IsValidTarget(Q.Range) && !target.IsZombie)
             {
                 Q.Cast(target);
             }
-            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsZombie && W.GetPrediction(target).HitChance >= HitChance.Medium)
+            if (useW && W.IsReady() && target.IsValidTarget(W.Range) && !target.IsZombie)
             {
                 W.Cast(target);
             }

@@ -18,7 +18,7 @@ namespace TristanaHu3
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Targeted R;
-        public static Menu Menu, SettingsMenu, KeysMenu;
+        public static Menu Menu, SettingsMenu;
 
 
         static void Main(string[] args)
@@ -38,7 +38,7 @@ namespace TristanaHu3
                 return;            
            
             Q = new Spell.Active(SpellSlot.Q, 550);
-            W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, 250, Int32.MaxValue, 80);
+            W = new Spell.Skillshot(SpellSlot.W, 825, SkillShotType.Circular, 250, int.MaxValue, 80);
             E = new Spell.Targeted(SpellSlot.E, 550);
             R = new Spell.Targeted(SpellSlot.R, 550);
 
@@ -58,12 +58,17 @@ namespace TristanaHu3
             SettingsMenu.Add("Qlane", new CheckBox("Use Q on LaneClear"));
             SettingsMenu.Add("Elane", new CheckBox("Use E on LaneClear"));
             SettingsMenu.Add("Etower", new CheckBox("Use E on Towers"));
-            SettingsMenu.Add("laneMana", new Slider("Mana % To Use Spells On LaneClear", 30, 0, 100));
+            SettingsMenu.Add("laneMana", new Slider("Mana % To Use Spells On LaneClear", 30));
             SettingsMenu.AddLabel("KillSteal");
             SettingsMenu.Add("Wks", new CheckBox("Use W KillSteal"));
             SettingsMenu.Add("Rks", new CheckBox("Use R KillSteal"));
             SettingsMenu.Add("ERks", new CheckBox("Use E+R KillSteal"));
-            SettingsMenu.AddLabel("Draw");
+            SettingsMenu.AddLabel("GapCloser/Interrupter");
+            SettingsMenu.Add("Rgap", new CheckBox("Use R On GapClosers"));
+            SettingsMenu.Add("Rint", new CheckBox("Use R To Interrupt"));
+            SettingsMenu = Menu.AddSubMenu("Draw", "Draw");
+            SettingsMenu.AddGroupLabel("Draw");
+            SettingsMenu.AddLabel("Drawings");
             SettingsMenu.Add("Edraw", new CheckBox("Draw E"));
             SettingsMenu.Add("Wdraw", new CheckBox("Draw W"));
             SettingsMenu.Add("Rdraw", new CheckBox("Draw R"));
@@ -71,8 +76,31 @@ namespace TristanaHu3
             Game.OnTick += Game_OnTick;
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnLevelUp += AIHeroClient_OnLevelUp;
+            Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
+            Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
 
         }
+
+        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,Interrupter.InterruptableSpellEventArgs e)
+        {
+            if (!sender.IsValidTarget(Q.Range) || e.DangerLevel != DangerLevel.High)
+                return;
+
+            if (R.IsReady() && R.IsInRange(sender) && SettingsMenu["Rint"].Cast<CheckBox>().CurrentValue)
+            {
+                R.Cast(sender);
+            }
+
+        }
+
+        private static void Gapcloser_OnGapCloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
+        {
+            if (!e.Sender.IsValidTarget() || !SettingsMenu["Rgap"].Cast<CheckBox>().CurrentValue)
+                return;
+
+            R.Cast(e.Sender);
+        }
+
         private static void Game_OnTick(EventArgs args)
         {
             if (_Player.IsDead || MenuGUI.IsChatOpen || _Player.IsRecalling) return;
@@ -95,6 +123,7 @@ namespace TristanaHu3
 
             KillSteal();
         }
+
         private static void ForceETarget()
         {
             var target = TargetSelector.GetTarget(_Player.AttackRange, DamageType.Physical);
@@ -113,6 +142,7 @@ namespace TristanaHu3
                 }
             }
         }
+
         private static void AIHeroClient_OnLevelUp(Obj_AI_Base sender, Obj_AI_BaseLevelUpEventArgs args)
         {
             Q = new Spell.Active(SpellSlot.Q, (uint)_Player.GetAutoAttackRange());
